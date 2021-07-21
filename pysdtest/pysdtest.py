@@ -1,23 +1,19 @@
 """
-
-@author: Kyungho Lee (SNU)
-
-Latest Update at July 5th 2021
+@author: Kyungho Lee (Yale)
+Latest Update at July 19th 2021
 
 Python Code for
 Stochastic Dominance Test 
-
 """
 
 # Import modules
-import operator as op
+from Resampling_Functions import bootstrap, subsampling, paired_bootstrap
+from Test_Stat_Functions import CDF, set_grid
 import numpy as np
 import matplotlib.pyplot as plt
-import math
-import random
 import time
 
-
+#%%
 class test_sd :
     
     """
@@ -42,7 +38,7 @@ class test_sd :
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
     
-    grid    : int
+    ngrid    : int
                 # of grid points
     s       : int
                 Order of Stochastic Dominance
@@ -51,32 +47,43 @@ class test_sd :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'subsampling' and 'bootstrap'  
+               
+                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
                 
-                'subsampling' -> use sumbsampling method suggested by LMW
+                'subsampling' -> use sumbsampling method as in LMW
                 'bootstrap'   -> use recentered bootstrap method as in BD and LMW
+                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nsamp   : int
                 # of bootstrap statistics for bootstrap distribution
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, b1, b2, resampling, nsamp = 200) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200) :
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.b1          = b1
-        self.b2          = b2
         self.resampling  = resampling
         self.nsamp       = nsamp
-            
-        minx = min(sample1.min(0), sample2.min(0))
-        maxx = max(sample1.max(0), sample2.max(0))     
-        grid = np.linspace(minx,maxx, num=ngrid)
         
+        # set grid
+        samples = [sample1, sample2]
+        grid = set_grid(samples, ngrid)
         self.grid = grid
+        
+        if resampling == "bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+        
+        elif resampling == "paired_bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+            
+        self.b1          = b1
+        self.b2          = b2
+
         
     def testing(self) :
         
@@ -109,16 +116,10 @@ class test_sd :
         
         
         start_time = time.time()
-                
-        # grid
-        grid  = self.grid
         
         # Estimation
-        test_stat   = self.T_N(sample1, sample2, grid, s)
-        test_stat_b = self.resampled_stat(sample1, sample2, grid, s, b1, b2, resampling, nsamp)
-        
-        print(test_stat)
-        print(test_stat_b)
+        test_stat   = self.T_N()
+        test_stat_b = self.resampled_stat()
         
         pval = (test_stat_b >= test_stat).mean(0) 
         
@@ -142,15 +143,18 @@ class test_sd :
         
         print('* # (sample1) \t\t = %6d' % sample1.shape[0],
           '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
-        print('* # ('+ resampling + '1) \t = %6d' % b1,
-          '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        if self.resampling == 'subsampling':
+            print('* # ('+ resampling + '1) \t = %6d' % b1,
+              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        else:
+            print('* The # of bootstrapping: ', nsamp )
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
+        print('* SD order \t\t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('#-------------------------------------------#\n')    
         print('* Test Result *\n')    
 
-        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Test statistic = %5.4f' % test_stat)
         print('* p-value \t\t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
@@ -161,31 +165,14 @@ class test_sd :
                    'pval'        : pval[0]
                    }
         
-    def operator(self, sample, grid, s):
-        
-        # np.apply_along_axis(operator, axis, a, b)
-        # apply operator (in here, op.lt) along axis
-        # op.lt(a,b) <=> a < b
-        # op.sub(a,b) <=> a - b
-            
-        return (np.apply_along_axis(op.lt, 1, sample, grid) * (- np.apply_along_axis(op.sub, 1, sample, grid)) ** (
-            s - 1) / math.factorial(s - 1))
     
-    def D(self, sample, grid, s):
+    def T_N(self):
+           
+        sample1 = self.sample1
+        sample2 = self.sample2
+        grid    = self.grid
+        s       = self.s
         
-        if sample.ndim != 3:       
-            sample = sample[:,None,None]
-        
-        # We take average here.
-        # if s = 1, D equals to ecdf
-        
-        operator = self.operator
-        D = operator(sample, grid, s).mean(0)
-        
-        return D 
-    
-    def T_N(self, sample1, sample2, grid, s):
-            
         """
             
         test statsitics
@@ -195,12 +182,10 @@ class test_sd :
             
         """
         
-        D = self.D
-        
         n1 = sample1.shape[0]
         n2 = sample2.shape[0]
         
-        D_s = D(sample1, grid, s) - D(sample2, grid, s)
+        D_s = CDF(sample1, grid, s) - CDF(sample2, grid, s)
         
         if D_s.ndim == 1:
             return (n1 * n2 / (n1 + n2)) ** (0.5) * (D_s).max(0)
@@ -208,89 +193,23 @@ class test_sd :
         else:
             return (n1 * n2 / (n1 + n2)) ** (0.5) * (D_s).max(0)[:,None]
         
-    def subsampling(self, sample, subsize, nsub):
+    def resampled_stat(self):
         
-        """
+        sample1   = self.sample1
+        sample2   = self.sample2
+        grid      = self.grid
+        s         = self.s
+        b1        = self.b1
+        b2        = self.b2
+        resampling = self.resampling
+        nsamp     = self.nsamp
         
-        Subsampling
-        
-        Parameters
-        ----------
-        sample  : np.array (1-d)
-        subsize : number of samples chosen by subsampling
-        nsum    : number of subsample test statistics
-        
-        """
-        
-        
-        # nsub : # of subsamples
-        # subindex : subsample size x 1 x nsub
-        subindex = (np.arange(0, subsize, 1)[:, None] + np.arange(0, nsub, 1)[:, None].T)[:, None]
-    
-        # subsample : subsample size x 1 x nsub x 1
-        subsample = sample[subindex]
-        return subsample
-    
-    def bootstrap(self, sample, btspsize, nbtsp):
-        
-        
-        """
-        
-        Recentered Bootstrap
-        
-        Parameters
-        ----------
-        sample   : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample = sample[btspindex]
-        return btspsample
-        
-    
-    def paired_bootstrap(self, sample1, sample2, btspsize, nbtsp):
-        
-        """
-        
-        Paired Bootstrap
-        
-        Parameters
-        ----------
-        sample1  : np.array (1-d)
-        sample2  : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample1.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample1 = sample1[btspindex]
-        btspsample2 = sample2[btspindex]
-        
-        return btspsample1, btspsample2 
-    
-    def resampled_stat(self, sample1, sample2, grid, s, b1, b2, resampling, nsamp):
-        
-        D = self.D
         
         n1 = sample1.shape[0]
         n2 = sample2.shape[0]
             
         if resampling == 'subsampling' :
             
-            subsampling = self.subsampling
-
             # resampling via 'subsampling'
             
             # This part is to take into account different sample size (Linton, 2005)
@@ -301,14 +220,12 @@ class test_sd :
             subsample1 = subsampling(sample1, b1, nsub) # n1 x 1 x N-b+1
             subsample2 = subsampling(sample2, b2, nsub) # n2 x 1 x N-b+1
             
-            D_sub = D(subsample1, grid, s) - D(subsample2, grid, s) # ngrid x N-b+1
+            D_sub = CDF(subsample1, grid, s) - CDF(subsample2, grid, s) # ngrid x N-b+1
             
             # take supremum over support
             return (b) ** (0.5) * (D_sub).max(0)[:, None]
                 
         elif resampling == 'bootstrap' :
-            bootstrap = self.bootstrap
-
             # resampling via 'boostrap'
                 
             btspsample1 = bootstrap(sample1, b1, nsamp)
@@ -320,17 +237,15 @@ class test_sd :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
             
             # take supremum over support
             return (n1 * n2 /(n1 + n2)) ** (0.5) * (D_btsp).max(0)[:, None]
         
         elif resampling == "paired_bootstrap" :
-            
-            paired_bootstrap = self.paired_bootstrap
-            
+                        
             btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
             
             if sample1.ndim != 3:       
@@ -339,8 +254,8 @@ class test_sd :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
             
             # take supremum over support
@@ -350,7 +265,7 @@ class test_sd :
             print("check resampling parameter")
       
         
-    def plot_D(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
+    def plot_CDF(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
         
         """
         
@@ -374,10 +289,9 @@ class test_sd :
         
         grid    = self.grid
         s       = self.s
-        D       = self.D
 
-        D1 = D(sample1,grid,s)
-        D2 = D(sample2,grid,s)
+        D1 = CDF(sample1,grid,s)
+        D2 = CDF(sample2,grid,s)
         
         # if s == 1 :
         #     ylabel = "Cumulative distribution function"
@@ -396,9 +310,7 @@ class test_sd :
 
         plt.show()
         
-        
-    
-        
+#%%        
 class test_sd_contact :
   
     """
@@ -424,7 +336,7 @@ class test_sd_contact :
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
     
-    grid    : int
+    ngrid    : int
                 # of grid points
     s       : int
                 Order of Stochastic Dominance
@@ -433,10 +345,11 @@ class test_sd_contact :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'subsampling', 'bootstrap' and 'paired_bootstrap'
+                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
                 
-                'subsampling' -> use sumbsampling method suggested by LMW
+                'subsampling' -> use sumbsampling method as in LMW
                 'bootstrap'   -> use recentered bootstrap method as in BD and LMW
+                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nsamp   : int
                 # of bootstraping (default value: 200)
@@ -446,14 +359,12 @@ class test_sd_contact :
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, b1, b2, resampling, nsamp = 200, c = 0.75) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200, c = 0.75) :
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.b1          = b1
-        self.b2          = b2
         self.nsamp       = nsamp
         self.n1          = sample1.shape[0]   
         self.n2          = sample2.shape[0]   
@@ -461,12 +372,20 @@ class test_sd_contact :
 
 
         # setting grid
-        minx = min(sample1.min(0), sample2.min(0))
-        maxx = max(sample1.max(0), sample2.max(0))     
-        grid = np.linspace(minx,maxx, num=ngrid)
+        samples = [sample1, sample2]
+        grid = set_grid(samples, ngrid)
+        self.grid = grid        
         
-        self.grid = grid
+        if resampling == "bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
         
+        elif resampling == "paired_bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+            
+        self.b1          = b1
+        self.b2          = b2
         
         # Tuning parameter
         self.c           = c
@@ -506,13 +425,10 @@ class test_sd_contact :
         c           = self.c
         
         start_time = time.time()
-                
-        # grid
-        grid  = self.grid
         
         # Estimation
-        test_stat   = self.T_N(sample1, sample2, grid, s)
-        test_stat_b = self.resampled_stat(sample1, sample2, grid, s, b1, b2, resampling, nsamp)
+        test_stat   = self.T_N()
+        test_stat_b = self.resampled_stat()
         
         pval = (test_stat_b >= test_stat).mean(0) 
         
@@ -536,16 +452,20 @@ class test_sd_contact :
         
         print('* # (sample1) \t\t = %6d' % sample1.shape[0],
           '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
-        print('* # ('+ resampling + '1) \t = %6d' % b1,
-          '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        if self.resampling == 'subsampling':
+            print('* # ('+ resampling + '1) \t = %6d' % b1,
+              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        else:
+            print('* The # of bootstrapping: ', nsamp )
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
+        print('* SD order \t\t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
-        print("Tuning parameter c = %6d" % c)
+        print("# Tuning parameter -------")
+        print("* c = %5.4f" % c)
         print('#-------------------------------------------#\n')    
         print('* Test Result *\n')    
 
-        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Test statistic = %5.4f' % test_stat)
         print('* p-value \t\t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
@@ -557,31 +477,13 @@ class test_sd_contact :
                    }
         
         
-    def operator(self, sample, grid, s):
-        
-        # np.apply_along_axis(operator, axis, a, b)
-        # apply operator (in here, op.lt) along axis
-        # op.lt(a,b) <=> a < b
-        # op.sub(a,b) <=> a - b
+    def T_N(self):
             
-        return (np.apply_along_axis(op.lt, 1, sample, grid) * (- np.apply_along_axis(op.sub, 1, sample, grid)) ** (
-            s - 1) / math.factorial(s - 1))
-    
-    def D(self, sample, grid, s):
+        sample1 = self.sample1
+        sample2 = self.sample2
+        grid    = self.grid
+        s       = self.s
         
-        if sample.ndim != 3:       
-            sample = sample[:,None,None]
-        
-        # We take average here.
-        # if s = 1, D equals to ecdf
-        
-        operator = self.operator
-        D = operator(sample, grid, s).mean(0)
-        
-        return D 
-    
-    def T_N(self, sample1, sample2, grid, s):
-            
         """
             
         test statsitics
@@ -590,13 +492,11 @@ class test_sd_contact :
         S_jf in BD
             
         """
-        
-        D = self.D
-        
+                
         n1 = sample1.shape[0]
         n2 = sample2.shape[0]
         
-        D_s = D(sample1, grid, s) - D(sample2, grid, s)
+        D_s = CDF(sample1, grid, s) - CDF(sample2, grid, s)
         
         self.D_s  = D_s
         
@@ -607,80 +507,7 @@ class test_sd_contact :
         else:
             return (n1 * n2 / (n1 + n2)) * np.trapz(((D_s>0) * D_s)**(2),axis=0)[:,None]
         
-    def subsampling(self, sample, subsize, nsub):
-        
-        """
-        
-        Subsampling
-        
-        Parameters
-        ----------
-        sample  : np.array (1-d)
-        subsize : number of samples chosen by subsampling
-        nsum    : number of subsample test statistics
-        
-        """
-        
-        
-        # nsub : # of subsamples
-        # subindex : subsample size x 1 x nsub
-        subindex = (np.arange(0, subsize, 1)[:, None] + np.arange(0, nsub, 1)[:, None].T)[:, None]
-    
-        # subsample : subsample size x 1 x nsub x 1
-        subsample = sample[subindex]
-        return subsample
-    
-    def bootstrap(self, sample, btspsize, nbtsp):
-        
-        
-        """
-        
-        Recentered Bootstrap
-        
-        Parameters
-        ----------
-        sample   : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample = sample[btspindex]
-        return btspsample
-        
-    
-    def paired_bootstrap(self, sample1, sample2, btspsize, nbtsp):
-        
-        """
-        
-        Paired Bootstrap
-        
-        Bootstrapping (X_1, X_2) together to allow dependence.
-        
-        Parameters
-        ----------
-        sample1  : np.array (1-d)
-        sample2  : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample1.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample1 = sample1[btspindex]
-        btspsample2 = sample2[btspindex]
-        
-        return btspsample1, btspsample2 
-    
+
     def contact_set_estimation(self):
     
         """
@@ -720,13 +547,25 @@ class test_sd_contact :
         self.contact_set = contact_set
         
     
-    def resampled_stat(self, sample1, sample2, grid, s, b1, b2, resampling, nsamp):
+    def resampled_stat(self):
         
-        D                      = self.D
+        sample1    = self.sample1
+        sample2    = self.sample2
+        grid       = self.grid
+        s          = self.s
+        b1         = self.b1
+        b2         = self.b2
+        resampling = self.resampling
+        nsamp      = self.nsamp
+        
         contact_set_estimation = self.contact_set_estimation
         n1                     = self.n1
         n2                     = self.n2
         ngrid                  = self.ngrid 
+        
+        
+        
+        
         # contact-set estimation using the whole sample
         contact_set_estimation()        
         contact_set = self.contact_set
@@ -735,8 +574,6 @@ class test_sd_contact :
         
         if resampling == 'subsampling' :
             
-            subsampling = self.subsampling
-
             # resampling via 'subsampling'
             
             # This part is to take into account different sample size (Linton, 2005)
@@ -747,7 +584,7 @@ class test_sd_contact :
             subsample1 = subsampling(sample1, b1, nsub) # n1 x 1 x N-b+1
             subsample2 = subsampling(sample2, b2, nsub) # n2 x 1 x N-b+1
             
-            D_sub = D(subsample1, grid, s) - D(subsample2, grid, s) # ngrid x N-b+1
+            D_sub = CDF(subsample1, grid, s) - CDF(subsample2, grid, s) # ngrid x N-b+1
             
             # generate contact_set_rep for bootstrap sample
             # contact_set_rep is ngrid x nsamp dimension
@@ -763,8 +600,6 @@ class test_sd_contact :
             return (b) * np.trapz(((D_sub_contact>0) * D_sub_contact)**(2),axis=0)[:, None]
                 
         elif resampling == 'bootstrap' :
-            bootstrap = self.bootstrap
-
             # resampling via 'boostrap'
                 
             btspsample1 = bootstrap(sample1, b1, nsamp)
@@ -776,8 +611,8 @@ class test_sd_contact :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
         
             # generate contact_set_rep for bootstrap sample
@@ -793,9 +628,7 @@ class test_sd_contact :
             return (n1 * n2 / (n1 + n2)) * np.trapz(((D_btsp_contact>0) * D_btsp_contact)**(2),axis=0)[:,None]
         
         elif resampling == "paired_bootstrap" :
-            
-            paired_bootstrap = self.paired_bootstrap
-            
+                        
             btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
             
             if sample1.ndim != 3:       
@@ -804,8 +637,8 @@ class test_sd_contact :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
             
             # generate contact_set_rep for bootstrap sample
@@ -824,7 +657,7 @@ class test_sd_contact :
             print("check resampling parameter")
       
         
-    def plot_D(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
+    def plot_CDF(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
         
         """
         
@@ -848,10 +681,9 @@ class test_sd_contact :
         
         grid    = self.grid
         s       = self.s
-        D       = self.D
 
-        D1 = D(sample1,grid,s)
-        D2 = D(sample2,grid,s)
+        D1 = CDF(sample1,grid,s)
+        D2 = CDF(sample2,grid,s)
         
         # if s == 1 :
         #     ylabel = "Cumulative distribution function"
@@ -870,9 +702,7 @@ class test_sd_contact :
 
         plt.show()
         
-        
-################# Donald and Hsu ###########################
-        
+#%%                
 class test_sd_SR :
   
     """
@@ -920,35 +750,42 @@ class test_sd_SR :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, b1, b2, resampling, nsamp = 200, a = 0.1, eta = 10**(-6)):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200, a = 0.1, eta = 10**(-6)):
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.b1          = b1
-        self.b2          = b2
         self.nsamp       = nsamp
         
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
         
-        self.n1          = sample1.shape[0]   
-        self.n2          = sample2.shape[0]   
+        self.n1          = n1   
+        self.n2          = n2   
         self.resampling  = resampling
         self.a           = a
 
-        # setting grid
-        minx = min(sample1.min(0), sample2.min(0))
-        maxx = max(sample1.max(0), sample2.max(0))     
-        grid = np.linspace(minx,maxx, num=ngrid)
-        
+        # set grid
+        samples = [sample1, sample2]
+        grid = set_grid(samples, ngrid)
         self.grid = grid
         
         seq_a = -a* np.sqrt(np.log (np.log(n1+n2)))
         # Tuning parameter
         self.seq_a           = seq_a
         self.eta             = eta
+        
+        if resampling == "bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+        
+        elif resampling == "paired_bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+            
+        self.b1          = b1
+        self.b2          = b2
         
     def testing(self) :
         
@@ -988,11 +825,11 @@ class test_sd_SR :
         grid  = self.grid
         
         # Estimation
-        test_stat   = self.T_N(sample1, sample2, grid, s)
+        test_stat   = self.T_N()
         self.test_stat = test_stat
         
-        test_stat_b = self.resampled_stat(sample1, sample2, grid, s, b1, b2, resampling, nsamp)
-        test_stat_b[test_stat_b <= 10**(-6)] = 10^(-6)
+        test_stat_b = self.resampled_stat()
+        test_stat_b[test_stat_b <= 10**(-6)] = 10**(-6)
         
         pval = (test_stat_b >= test_stat).mean(0) 
         
@@ -1016,18 +853,21 @@ class test_sd_SR :
         
         print('* # (sample1) \t\t = %6d' % sample1.shape[0],
           '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
-        print('* # ('+ resampling + '1) \t = %6d' % b1,
-          '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        if self.resampling == 'subsampling':
+            print('* # ('+ resampling + '1) \t = %6d' % b1,
+              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        else:
+            print('* The # of bootstrapping: ', nsamp )
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
+        print('* SD order \t\t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeters -------------')
-        print('# a = %6d' % a)
-        print('# eta = %6d' % eta)
+        print('* a   = %5.4f' % a)
+        print('* eta = %5.6f' % eta)
         print('#-------------------------------------------#\n')    
         print('* Test Result *\n')    
 
-        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Test statistic = %5.4f' % test_stat)
         print('* p-value \t\t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
@@ -1038,31 +878,9 @@ class test_sd_SR :
                    'pval'        : pval[0]
                    }
         
-    def operator(self, sample, grid, s):
+
+    def T_N(self):
         
-        # np.apply_along_axis(operator, axis, a, b)
-        # apply operator (in here, op.lt) along axis
-        # op.lt(a,b) <=> a < b
-        # op.sub(a,b) <=> a - b
-            
-        return (np.apply_along_axis(op.lt, 1, sample, grid) * (- np.apply_along_axis(op.sub, 1, sample, grid)) ** (
-            s - 1) / math.factorial(s - 1))
-    
-    def D(self, sample, grid, s):
-        
-        if sample.ndim != 3:       
-            sample = sample[:,None,None]
-        
-        # We take average here.
-        # if s = 1, D equals to ecdf
-        
-        operator = self.operator
-        D = operator(sample, grid, s).mean(0)
-        
-        return D 
-    
-    def T_N(self, sample1, sample2, grid, s):
-            
         """
             
         test statsitics
@@ -1071,12 +889,16 @@ class test_sd_SR :
             
         """
         
-        D = self.D
+        sample1 = self.sample1
+        sample2 = self.sample2
+        grid    = self.grid
+        s       = self.s        
+
         
         n1 = sample1.shape[0]
         n2 = sample2.shape[0]
         
-        D_s = D(sample1, grid, s) - D(sample2, grid, s)
+        D_s = CDF(sample1, grid, s) - CDF(sample2, grid, s)
         self.D_s = D_s
         
         
@@ -1086,79 +908,6 @@ class test_sd_SR :
         else:
             return (n1 * n2 / (n1 + n2)) ** (0.5) * (D_s).max(0)[:,None]
 
-        
-    def subsampling(self, sample, subsize, nsub):
-        
-        """
-        
-        Subsampling
-        
-        Parameters
-        ----------
-        sample  : np.array (1-d)
-        subsize : number of samples chosen by subsampling
-        nsum    : number of subsample test statistics
-        
-        """
-        
-        
-        # nsub : # of subsamples
-        # subindex : subsample size x 1 x nsub
-        subindex = (np.arange(0, subsize, 1)[:, None] + np.arange(0, nsub, 1)[:, None].T)[:, None]
-    
-        # subsample : subsample size x 1 x nsub x 1
-        subsample = sample[subindex]
-        return subsample
-    
-    def bootstrap(self, sample, btspsize, nbtsp):
-        
-        
-        """
-        
-        Recentered Bootstrap
-        
-        Parameters
-        ----------
-        sample   : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample = sample[btspindex]
-        return btspsample
-        
-    
-    def paired_bootstrap(self, sample1, sample2, btspsize, nbtsp):
-        
-        """
-        
-        Paired Bootstrap
-        
-        Parameters
-        ----------
-        sample1  : np.array (1-d)
-        sample2  : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample1.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample1 = sample1[btspindex]
-        btspsample2 = sample2[btspindex]
-        
-        return btspsample1, btspsample2 
-    
     def selective_recentering(self):
     
         """
@@ -1176,7 +925,7 @@ class test_sd_SR :
         the following variables are generated 
         
         selected_set : numpy array (ngrid x 1)
-        sr_num      : int 
+        sl_num      : int 
         
         """
         
@@ -1199,9 +948,19 @@ class test_sd_SR :
         
     
     
-    def resampled_stat(self, sample1, sample2, grid, s, b1, b2, resampling, nsamp):
-        
-        D = self.D
+    def resampled_stat(self):
+
+        sample1    = self.sample1
+        sample2    = self.sample2
+        grid       = self.grid
+        s          = self.s
+        b1         = self.b1
+        b2         = self.b2
+        resampling = self.resampling
+        nsamp      = self.nsamp
+                
+
+
         selective_recentering = self.selective_recentering
         
         recentering_function = selective_recentering()
@@ -1212,8 +971,6 @@ class test_sd_SR :
             
         if resampling == 'subsampling' :
             
-            subsampling = self.subsampling
-
             # resampling via 'subsampling'
             
             # This part is to take into account different sample size (Linton, 2005)
@@ -1224,7 +981,7 @@ class test_sd_SR :
             subsample1 = subsampling(sample1, b1, nsub) # n1 x 1 x N-b+1
             subsample2 = subsampling(sample2, b2, nsub) # n2 x 1 x N-b+1
             
-            D_sub = D(subsample1, grid, s) - D(subsample2, grid, s) # ngrid x N-b+1
+            D_sub = CDF(subsample1, grid, s) - CDF(subsample2, grid, s) # ngrid x N-b+1
             
             selected_D_sub = D_sub + recentering_function
             
@@ -1232,8 +989,6 @@ class test_sd_SR :
             return (b) ** (0.5) * (selected_D_sub).max(0)[:, None]
                 
         elif resampling == 'bootstrap' :
-            bootstrap = self.bootstrap
-
             # resampling via 'boostrap'
                 
             btspsample1 = bootstrap(sample1, b1, nsamp)
@@ -1245,8 +1000,8 @@ class test_sd_SR :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
             selected_D_btsp = D_btsp + recentering_function
             
@@ -1254,9 +1009,7 @@ class test_sd_SR :
             return (n1 * n2 /(n1 + n2)) ** (0.5) * (selected_D_btsp).max(0)[:, None]
         
         elif resampling == "paired_bootstrap" :
-            
-            paired_bootstrap = self.paired_bootstrap
-            
+                        
             btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
             
             if sample1.ndim != 3:       
@@ -1265,8 +1018,8 @@ class test_sd_SR :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
             selected_D_btsp = D_btsp + recentering_function
             
@@ -1277,7 +1030,7 @@ class test_sd_SR :
             print("check resampling parameter")
       
         
-    def plot_D(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
+    def plot_CDF(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
         
         """
         Parameters
@@ -1295,10 +1048,9 @@ class test_sd_SR :
         
         grid    = self.grid
         s       = self.s
-        D       = self.D
 
-        D1 = D(sample1,grid,s)
-        D2 = D(sample2,grid,s)
+        D1 = CDF(sample1,grid,s)
+        D2 = CDF(sample2,grid,s)
         
         # if s == 1 :
         #     ylabel = "Cumulative distribution function"
@@ -1317,11 +1069,7 @@ class test_sd_SR :
 
         plt.show()
         
-        
-#########################################################
-################# Hong and Li ###########################
-#########################################################
-
+#%%
         
 class test_sd_NDM :
   
@@ -1352,10 +1100,11 @@ class test_sd_NDM :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'subsampling' and 'bootstrap'  
+                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
                 
-                'subsampling' -> use sumbsampling method suggested by LMW
+                'subsampling' -> use sumbsampling method as in LMW
                 'bootstrap'   -> use recentered bootstrap method as in BD and LMW
+                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nsamp   : int
                 # of bootstrap statistics for bootstrap distribution
@@ -1372,22 +1121,20 @@ class test_sd_NDM :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, b1, b2, resampling, nsamp = 200, epsilon = None, form = "KS"):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200, epsilon = None, form = "KS"):
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.b1          = b1
-        self.b2          = b2
         self.nsamp       = nsamp
         
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
         r_N =  (n1 * n2 / (n1 + n2)) ** (0.5)
         
-        self.n1          = sample1.shape[0]   
-        self.n2          = sample2.shape[0]   
+        self.n1          = n1   
+        self.n2          = n2   
         self.resampling  = resampling
 
         # Tuning Parameters
@@ -1400,12 +1147,21 @@ class test_sd_NDM :
         # KS-type statistics is default
         self.form        = form
 
-        # setting grid
-        minx = min(sample1.min(0), sample2.min(0))
-        maxx = max(sample1.max(0), sample2.max(0))     
-        grid = np.linspace(minx,maxx, num=ngrid)
-        
+        # set grid
+        samples = [sample1, sample2]
+        grid = set_grid(samples, ngrid)
         self.grid = grid
+        
+        
+        if resampling == "bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+        elif resampling == "paired_bootstrap":        
+            b1          = sample1.shape[0]
+            b2          = sample2.shape[0]
+            
+        self.b1          = b1
+        self.b2          = b2
         
         
     def testing(self) :
@@ -1439,15 +1195,12 @@ class test_sd_NDM :
         epsilon     = self.epsilon
         
         start_time = time.time()
-                
-        # grid
-        grid  = self.grid
-        
+                        
         # Estimation
-        test_stat   = self.T_N(sample1, sample2, grid, s)
+        test_stat   = self.T_N()
         self.test_stat = test_stat
         
-        test_stat_b = self.resampled_stat(sample1, sample2, grid, s, b1, b2, resampling, nsamp)
+        test_stat_b = self.resampled_stat()
         pval = (test_stat_b >= test_stat).mean(0) 
         
         if s == 1:
@@ -1470,17 +1223,22 @@ class test_sd_NDM :
         
         print('* # (sample1) \t\t = %6d' % sample1.shape[0],
           '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
-        print('* # ('+ resampling + '1) \t = %6d' % b1,
-          '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        
+        if self.resampling == 'subsampling':
+            print('* # ('+ resampling + '1) \t = %6d' % b1,
+              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+        else:
+            print('* The number of bootstrapping: ', nsamp )
+            
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
+        print('* SD order \t\t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning parameter ---------')
-        print('# epsilon = %6d' % epsilon)
+        print('# epsilon = %5.4f' % epsilon)
         print('#-------------------------------------------#\n')    
         print('* Test Result *\n')    
 
-        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Test statistic = %5.4f' % test_stat)
         print('* p-value \t\t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
@@ -1491,29 +1249,7 @@ class test_sd_NDM :
                    'pval'        : pval[0]
                    }
         
-    def operator(self, sample, grid, s):
-        
-        # np.apply_along_axis(operator, axis, a, b)
-        # apply operator (in here, op.lt) along axis
-        # op.lt(a,b) <=> a < b
-        # op.sub(a,b) <=> a - b
-            
-        return (np.apply_along_axis(op.lt, 1, sample, grid) * (- np.apply_along_axis(op.sub, 1, sample, grid)) ** (
-            s - 1) / math.factorial(s - 1))
-    
-    def D(self, sample, grid, s):
-        
-        if sample.ndim != 3:       
-            sample = sample[:,None,None]
-        
-        # We take average here.
-        # if s = 1, D equals to ecdf
-        
-        operator = self.operator
-        D = operator(sample, grid, s).mean(0)
-        
-        return D 
-    
+
     def phi(self, theta):
     
         """ Set and calculate functional phi """
@@ -1542,8 +1278,14 @@ class test_sd_NDM :
             else :
                 print("Functional form should be 'KS', 'L1' or 'L2'")
 
-    def T_N(self, sample1, sample2, grid, s):
-            
+    def T_N(self):
+        
+        
+        sample1 = self.sample1
+        sample2 = self.sample2
+        grid    = self.grid
+        s       = self.s
+        
         """
             
         test statsitics
@@ -1552,13 +1294,12 @@ class test_sd_NDM :
             
         """
         
-        D    = self.D
         form = self.form
         
         n1 = sample1.shape[0]
         n2 = sample2.shape[0]
         
-        D_s = D(sample1, grid, s) - D(sample2, grid, s)
+        D_s = CDF(sample1, grid, s) - CDF(sample2, grid, s)
         self.D_s = D_s
         
         if form == "KS":
@@ -1568,79 +1309,7 @@ class test_sd_NDM :
         elif form == "L2":
             return (n1 * n2 / (n1 + n2)) * np.trapz(((D_s>0) * D_s)**(2), axis = 0)
                 
-        
-    def subsampling(self, sample, subsize, nsub):
-        
-        """
-        
-        Subsampling
-        
-        Parameters
-        ----------
-        sample  : np.array (1-d)
-        subsize : number of samples chosen by subsampling
-        nsum    : number of subsample test statistics
-        
-        """
-        
-        
-        # nsub : # of subsamples
-        # subindex : subsample size x 1 x nsub
-        subindex = (np.arange(0, subsize, 1)[:, None] + np.arange(0, nsub, 1)[:, None].T)[:, None]
-    
-        # subsample : subsample size x 1 x nsub x 1
-        subsample = sample[subindex]
-        return subsample
-    
-    def bootstrap(self, sample, btspsize, nbtsp):
-        
-        
-        """
-        
-        Recentered Bootstrap
-        
-        Parameters
-        ----------
-        sample   : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample = sample[btspindex]
-        return btspsample
-        
-    
-    def paired_bootstrap(self, sample1, sample2, btspsize, nbtsp):
-        
-        """
-        
-        Paired Bootstrap
-        
-        Parameters
-        ----------
-        sample1  : np.array (1-d)
-        sample2  : np.array (1-d)
-        btspsize : number of samples chosen by bootstrapping
-        nbtsp    : number of bootstrap test statistics
-        
-        """
-        
-        n = sample1.shape[0]
-        # nbtsp : # of bootsrap samples
-        # btspindex : bootsrap size x 1 x nsamp
-        btspindex = np.array([np.random.randint(n, size=btspsize) for _ in np.arange(nbtsp)]).T[:,None,:]
-        # btspsample : bootstrap size x 1 x nbtsp x 1 
-        btspsample1 = sample1[btspindex]
-        btspsample2 = sample2[btspindex]
-        
-        return btspsample1, btspsample2 
-    
+            
     def NDM(self, D_b_recentered):
     
         """
@@ -1682,9 +1351,16 @@ class test_sd_NDM :
         
     
     
-    def resampled_stat(self, sample1, sample2, grid, s, b1, b2, resampling, nsamp):
+    def resampled_stat(self):
         
-        D = self.D
+        sample1    = self.sample1
+        sample2    = self.sample2
+        grid       = self.grid
+        s          = self.s
+        b1         = self.b1
+        b2         = self.b2
+        resampling = self.resampling
+        nsamp      = self.nsamp
         NDM = self.NDM
         
         
@@ -1693,8 +1369,6 @@ class test_sd_NDM :
             
         if resampling == 'subsampling' :
             
-            subsampling = self.subsampling
-
             # resampling via 'subsampling'
             
             # This part is to take into account different sample size (Linton, 2005)
@@ -1705,14 +1379,12 @@ class test_sd_NDM :
             subsample1 = subsampling(sample1, b1, nsub) # n1 x 1 x N-b+1
             subsample2 = subsampling(sample2, b2, nsub) # n2 x 1 x N-b+1
             
-            D_sub = D(subsample1, grid, s) - D(subsample2, grid, s) # ngrid x N-b+1
+            D_sub = CDF(subsample1, grid, s) - CDF(subsample2, grid, s) # ngrid x N-b+1
 
             # Approximating asymptotic distribution via NDM                        
             return NDM(D_sub)
                 
         elif resampling == 'bootstrap' :
-            bootstrap = self.bootstrap
-
             # resampling via 'boostrap'
                 
             btspsample1 = bootstrap(sample1, b1, nsamp)
@@ -1724,8 +1396,8 @@ class test_sd_NDM :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
             
             # Approximating asymptotic distribution via NDM
@@ -1743,8 +1415,8 @@ class test_sd_NDM :
                 sample2 = sample2[:,None,None]
                     
             # recentering
-            D1_recentered = D(btspsample1, grid, s) - D(sample1, grid, s) 
-            D2_recentered = D(btspsample2, grid, s) - D(sample2, grid, s) 
+            D1_recentered = CDF(btspsample1, grid, s) - CDF(sample1, grid, s) 
+            D2_recentered = CDF(btspsample2, grid, s) - CDF(sample2, grid, s) 
             D_btsp = D1_recentered - D2_recentered
 
             # Approximating asymptotic distribution via NDM            
@@ -1754,7 +1426,7 @@ class test_sd_NDM :
             print("check resampling parameter")
       
         
-    def plot_D(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
+    def plot_CDF(self, save = False, title = None, label1 = "sample1", label2 = "sample2", xlabel = "x"):
         
         """
         Parameters
@@ -1776,10 +1448,9 @@ class test_sd_NDM :
         
         grid    = self.grid
         s       = self.s
-        D       = self.D
 
-        D1 = D(sample1,grid,s)
-        D2 = D(sample2,grid,s)
+        D1 = CDF(sample1,grid,s)
+        D2 = CDF(sample2,grid,s)
         
         # if s == 1 :
         #     ylabel = "Cumulative distribution function"
