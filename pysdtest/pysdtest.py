@@ -7,8 +7,8 @@ Stochastic Dominance Test
 """
 
 # Import modules
-from Resampling_Functions import bootstrap, subsampling, paired_bootstrap
-from Test_Stat_Functions import CDF, set_grid
+from pysdtest.Resampling_Functions import bootstrap, subsampling, paired_bootstrap
+from pysdtest.Test_Stat_Functions import CDF, set_grid
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -33,12 +33,12 @@ class test_sd :
     In here, we follow the notation in LMW
 
     Parameters
-    ----------
+    ==============================
     sample1 : np.array (1-d)
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
     
-    ngrid    : int
+    ngrid   : int
                 # of grid points
     s       : int
                 Order of Stochastic Dominance
@@ -90,10 +90,7 @@ class test_sd :
         """
         
         Returns
-        -------
-            None
-            In here, we print the result
-            
+        ==============================            
         test_stat   : float
                 the value of the test statistic
         test_stat_b : numpy array
@@ -270,7 +267,7 @@ class test_sd :
         """
         
         Parameters
-        ==========
+        ==============================
         save  : boolean
             if True, save figure
         titel : str
@@ -331,7 +328,7 @@ class test_sd_contact :
     In here, we follow the notation in LSW
 
     Parameters
-    ----------
+    ==============================
     sample1 : np.array (1-d)
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
@@ -399,9 +396,7 @@ class test_sd_contact :
         """
         
         Returns
-        -------
-            None
-            In here, we print the result
+        ==============================
             
         test_stat   : float
                 the value of the test statistic
@@ -516,14 +511,12 @@ class test_sd_contact :
         This estimation is condcuted by using original samples.
         
         Parameters
-        ----------
+        ==============================
             None
             
         
         Results
-        ----------
-        the following variables are generated 
-        
+        ==============================        
         contact_set : numpy array (ngrid x 1)
         ct_num      : int 
         
@@ -562,8 +555,6 @@ class test_sd_contact :
         n1                     = self.n1
         n2                     = self.n2
         ngrid                  = self.ngrid 
-        
-        
         
         
         # contact-set estimation using the whole sample
@@ -662,7 +653,7 @@ class test_sd_contact :
         """
         
         Parameters
-        ==========
+        ==============================
         save  : boolean
             if True, save figure
         titel : str
@@ -721,7 +712,7 @@ class test_sd_SR :
     H1 : d_s > 0
     
     Parameters
-    ----------
+    ==============================
     sample1 : np.array (1-d)
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
@@ -792,10 +783,7 @@ class test_sd_SR :
         """
         
         Returns
-        -------
-            None
-            In here, we print the result
-            
+        ==============================            
         test_stat   : float
                 the value of the test statistic
         test_stat_b : numpy array
@@ -821,9 +809,6 @@ class test_sd_SR :
         
         start_time = time.time()
                 
-        # grid
-        grid  = self.grid
-        
         # Estimation
         test_stat   = self.T_N()
         self.test_stat = test_stat
@@ -916,14 +901,12 @@ class test_sd_SR :
         This estimation is condcuted by using original samples.
         
         Parameters
-        ----------
-            None
+        ==============================
+        None
             
         
         Results
-        ----------
-        the following variables are generated 
-        
+        ==============================        
         selected_set : numpy array (ngrid x 1)
         sl_num      : int 
         
@@ -1034,7 +1017,7 @@ class test_sd_SR :
         
         """
         Parameters
-        ==========
+        ==============================
         save  : boolean
             if True, save figure
         titel : str
@@ -1086,7 +1069,7 @@ class test_sd_NDM :
     H1 : d_s > 0
     
     Parameters
-    ----------
+    ==============================
     sample1 : np.array (1-d)
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
@@ -1169,7 +1152,7 @@ class test_sd_NDM :
         """
         
         Returns
-        -------
+        ==============================
             None
             In here, we print the result
             
@@ -1317,14 +1300,12 @@ class test_sd_NDM :
         Attaining aymptotic distributions by Numerical Delta Method (Hong and Li, 2018)
                 
         Parameters
-        ----------
-            D_b_recentered : numpy array ()
+        ==============================
+        D_b_recentered : numpy array (ngrid x 1 x nbtsp (or nsub))
             
         
         Results
-        ----------
-        the following variables are generated 
-        
+        ==============================        
         phi_prime : numpy array (ngrid x 1)
         
         """
@@ -1332,14 +1313,22 @@ class test_sd_NDM :
         D_s     = self.D_s
         n1      = self.n1
         n2      = self.n2
+        b1      = self.b1
+        b2      = self.b2
         epsilon = self.epsilon
         form    = self.form
         phi     = self.phi
+        resampling = self.resampling
         
         phi_D   = phi(D_s)
         
         # estimation
-        r_N = ((n1*n2) / (n1 + n2))**(0.5)
+        
+        if resampling == "subsampling":
+            r_N = ((b1*b2) / (b1 + b2))**(0.5)            
+            
+        else:
+            r_N = ((n1*n2) / (n1 + n2))**(0.5)
 
         #  First order Approximation
         if   form == "KS" or form == "L1" :
@@ -1372,8 +1361,6 @@ class test_sd_NDM :
             # resampling via 'subsampling'
             
             # This part is to take into account different sample size (Linton, 2005)
-            lbd = n2 / (n1 + n2)
-            b = lbd * b1
             nsub = np.min([n1 - b1 + 1, n2 - b2 + 1])            
         
             subsample1 = subsampling(sample1, b1, nsub) # n1 x 1 x N-b+1
@@ -1430,7 +1417,7 @@ class test_sd_NDM :
         
         """
         Parameters
-        ==========
+        ==============================
         save  : boolean
             if True, save figure
         titel : str

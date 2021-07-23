@@ -16,11 +16,15 @@ def subsampling(sample, subsize, nsub):
     Subsampling
         
     Parameters
-    ----------
+    ==============================
     sample  : np.array (1-d)
     subsize : number of samples chosen by subsampling
     nsub    : number of subsample test statistics
         
+    Returns
+    ==============================
+    subsample : (N x nsub) numpy array
+
     """
         
         
@@ -37,14 +41,18 @@ def bootstrap(sample, b, nbtsp):
             
     """
         
-    Recentered Bootstrap
+    Generate Bootstrap Sample
         
     Parameters
-    ----------
+    ==============================
     sample   : np.array (1-d)
     btspsize : number of samples chosen by bootstrapping
     nbtsp    : number of bootstrap test statistics
         
+    Returns
+    ==============================
+    btspsample : (N x nbtsp) numpy array
+    
     """
         
     n = sample.shape[0]
@@ -60,14 +68,17 @@ def paired_bootstrap(sample1, sample2, b, nbtsp):
         
     """
         
-    Paired Bootstrap
+    Generate Paired Bootstrap Sample
         
     Parameters
-    ----------
-    sample1  : np.array (1-d)
-    sample2  : np.array (1-d)
+    ==============================
+    sample1  : (1-dim) numpy array
+    sample2  : (1-dim) numpy array
     btspsize : number of samples chosen by bootstrapping
     nbtsp    : number of bootstrap test statistics
+
+    ==============================
+    btspsample : (N x nbtsp) numpy array
         
     """
         
