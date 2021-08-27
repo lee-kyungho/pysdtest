@@ -29,9 +29,9 @@ Then, the user can use **PySDTest** on your Python interpreter.
 ## Features
 
 - Stochastic dominance (SD) testing via imposing the least favorable case (BD, LMW)
-- Contact-set approach for SD testing (LSW)
-- Selective recentering approach for SD testing (DH)
-- Numerical delta method for SD testing (HL)
+- SD testing via Contact-set approach (LSW)
+- SD testing via Selective recentering approach (DH)
+- SD testing via Numerical delta method (HL)
 - Advanced hypothesis testing (Joint hypotheses testing)
 - Plotting (s-th order) CDFs
 - Resampling: bootstrap, subsampling, and paired-bootstrap
