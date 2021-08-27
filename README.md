@@ -23,9 +23,6 @@ After installing **PySDTest**, an user can import it through the following code:
 ```python
 import pysdtest
 ```
-
-Then, the user can use **PySDTest** on your Python interpreter.
-
 ## Features
 
 - Stochastic dominance (SD) testing via imposing the least favorable case (BD, LMW)
