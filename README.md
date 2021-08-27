@@ -29,7 +29,7 @@ import pysdtest
 - SD testing via Contact-set approach (LSW)
 - SD testing via Selective recentering approach (DH)
 - SD testing via Numerical delta method (HL)
-- Advanced hypothesis testing (Joint hypotheses testing)
+- Advanced hypotheses testing (Joint hypotheses testing)
 - Plotting (s-th order) CDFs
 - Resampling: bootstrap, subsampling, and paired-bootstrap
 
@@ -63,7 +63,7 @@ pysdtest = pyimport("pysdtest")
 In Stata, an user can call **PySDTest** by plugging python codes in between Python: and end. For example, the following codes work for importing **PySDTest**:
 
 ```python
-# /* Calling PySDTest in Stata */
+" Calling PySDTest in Stata "
 python:
 import pysdtest
 end
