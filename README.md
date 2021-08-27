@@ -32,3 +32,41 @@ import pysdtest
 - Advanced hypothesis testing (Joint hypotheses testing)
 - Plotting (s-th order) CDFs
 - Resampling: bootstrap, subsampling, and paired-bootstrap
+
+## Integration with Other Software
+
+Python provides significant advantage regarding interaction with other programming languages and statistical software. Our package can be used in MATLAB, R, Julia, and Stata. 
+
+In MATLAB, an user can implement **PySDTest** as:
+
+```matlab
+% Calling PySDTest in MATLAB
+py.pysdtest
+```
+
+The reticulate library in R and the PyCall package in Julia serve similar feature, which calls Python modules in R and Julia, respectively:
+
+```r
+# Calling PySDTest in R
+
+library(reticulate)
+pysdtest <- import("pysdtest")
+```
+
+```julia
+# Calling PySDTest in Julia
+
+using PyCall
+pysdtest = pyimport("pysdtest")
+```
+
+In Stata, an user can call **PySDTest** by plugging python codes in between Python: and end. For example, the following codes work for importing **PySDTest**:
+
+```python
+# /* Calling PySDTest in Stata */
+python:
+import pysdtest
+end
+```
+
+In addition, a user can use python command in Stata to activate Python environment in Stata. For more detailed information, please refer to the [Using MATLAB with Python](https://www.mathworks.com/products/matlab/matlab-and-python.html) in MATLAB, [reticulate](https://rstudio.github.io/reticulate/articles/calling_python.html) library in R, [PyCall](https://github.com/JuliaPy/PyCall.jl) package in Julia and [Python integration feature](https://www.stata.com/stata16/python-integration/) in Stata.
