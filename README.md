@@ -11,7 +11,7 @@ This package implements stochastic dominance tests proposed by [Barrett and Dona
 **PySDTest** is listed on the Python Package Index (PyPI) which is a repository of software for the Python programming language. If Python is installed on your computer, you can install **PySDTest** by entering:
 
 ```python
-pip install PySDTesT
+pip install PySDTest
 ```
 
 in Windows cmd or Mac (or Linux) terminal. For detailed information about installing a Python package, see [Python Package User Guide in PyPI](https://packaging.python.org/tutorials/installing-packages/).
