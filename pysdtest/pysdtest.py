@@ -138,21 +138,21 @@ class test_sd :
         print('* Resampling method \t:', resampling)
         print('\n')
         
-        print('* # (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
+          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* The # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nsamp )
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t\t = %6d' % s,
+        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('#-------------------------------------------#\n')    
         print('* Test Result *\n')    
 
         print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t\t = %5.4f\n' % pval)
+        print('* p-value \t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
@@ -445,15 +445,15 @@ class test_sd_contact :
         print('* Resampling method \t:', resampling)
         print('\n')
         
-        print('* # (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
+          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* The # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nsamp )
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t\t = %6d' % s,
+        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print("# Tuning parameter -------")
         print("* c = %5.4f" % c)
@@ -461,7 +461,7 @@ class test_sd_contact :
         print('* Test Result *\n')    
 
         print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t\t = %5.4f\n' % pval)
+        print('* p-value \t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
@@ -830,21 +830,21 @@ class test_sd_SR :
     
 
         print('\n#-------------------------------------------#')    
-        print('Testing Stochastic Dominance by Selective Recentering Approach (Donald and Hsu 2014)',
+        print('Testing Stochastic Dominance by Selective Recentering Approach (Donald and Hsu 2016)',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
         
         print('* Resampling method \t:', resampling)
         print('\n')
         
-        print('* # (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
+          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* The # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nsamp )
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t\t = %6d' % s,
+        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeters -------------')
         print('* a   = %5.4f' % a)
@@ -853,7 +853,7 @@ class test_sd_SR :
         print('* Test Result *\n')    
 
         print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t\t = %5.4f\n' % pval)
+        print('* p-value \t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
@@ -919,7 +919,7 @@ class test_sd_SR :
         
         # estimation
         # pick indices for the 'contact set'
-        selected_set = D_s < seq_a
+        selected_set = (np.sqrt(n2) * D_s) < seq_a
         
         # to identify whether the contact set is empty
         sl_num      = np.sum(selected_set)
@@ -1204,17 +1204,17 @@ class test_sd_NDM :
         print('* Resampling method \t:', resampling)
         print('\n')
         
-        print('* # (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
+          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
         
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* The number of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nsamp )
             
         print('#-------------------------------------------#\n')    
-        print('* SD order \t\t\t = %6d' % s,
+        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning parameter ---------')
         print('# epsilon = %5.4f' % epsilon)
@@ -1222,7 +1222,7 @@ class test_sd_NDM :
         print('* Test Result *\n')    
 
         print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t\t = %5.4f\n' % pval)
+        print('* p-value \t = %5.4f\n' % pval)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
@@ -1248,7 +1248,7 @@ class test_sd_NDM :
             elif form == 'L2':
                 return np.trapz(((theta>0) * theta) ** 2, axis = 0)
             else :
-                print("Functional form should be KS or integral")
+                print("Functional form should be 'KS', 'L1' or 'L2'")
         
         # For resampled sample
         else:
