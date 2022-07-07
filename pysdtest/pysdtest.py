@@ -1,9 +1,8 @@
 """
-@author: Kyungho Lee (Yale)
-Latest Update at July 19th 2021
+@author: Kyungho Lee
+Latest Update at 8 July 2022
 
-Python Code for
-Stochastic Dominance Test 
+Python Package for Stochastic Dominance Tests
 """
 
 # Import modules
