@@ -1,6 +1,6 @@
 """
 @author: Kyungho Lee
-Latest Update at 8 July 2022
+Latest Update at 9 Aug 2022
 
 Python Package for Stochastic Dominance Tests
 """
@@ -17,20 +17,13 @@ class test_sd :
     
     """
 
-    Stochastic Dominance Test in Barett and Donald (2003 ECMA, hereafter BD), Linton, Maasoumi and Whang (2005 RES, hereafter LMW)
+    Stochastic Dominance Test by Barett and Donald (2003 ECMA, hereafter BD), Linton, Maasoumi and Whang (2005 RES, hereafter LMW)
 
     Kolmogorov-Smirnov type Test Statistic via imposing the Least Favorable Case
     
     H0 : the sample1 's'th-order stochastically dominates the sample2
     H1 : the negation of H0
     
-    <=> 
-    
-    H0 : d_s <= 0 
-    H1 : d_s > 0
-    
-    In here, we follow the notation in LMW
-
     Parameters
     ==============================
     sample1 : np.array (1-d)
@@ -50,22 +43,22 @@ class test_sd :
                 resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
                 
                 'subsampling' -> use sumbsampling method as in LMW
-                'bootstrap'   -> use recentered bootstrap method as in BD and LMW
+                'bootstrap'   -> use recentered bootstrap method as in BD
                 'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
-    nsamp   : int
+    nboot   : int
                 # of bootstrap statistics for bootstrap distribution
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200) :
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
         self.resampling  = resampling
-        self.nsamp       = nsamp
+        self.nboot       = nboot
         
         # set grid
         samples = [sample1, sample2]
@@ -108,7 +101,7 @@ class test_sd :
         b1          = self.b1
         b2          = self.b2
         resampling  = self.resampling
-        nsamp       = self.nsamp
+        nboot       = self.nboot
         
         
         start_time = time.time()
@@ -131,7 +124,7 @@ class test_sd :
     
 
         print('\n#-------------------------------------------#')    
-        print('Testing Stochastic Dominance',
+        print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
         
         print('* Resampling method \t:', resampling)
@@ -143,7 +136,7 @@ class test_sd :
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nboot )
         print('#-------------------------------------------#\n')    
         print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
@@ -198,7 +191,7 @@ class test_sd :
         b1        = self.b1
         b2        = self.b2
         resampling = self.resampling
-        nsamp     = self.nsamp
+        nboot     = self.nboot
         
         
         n1 = sample1.shape[0]
@@ -224,8 +217,8 @@ class test_sd :
         elif resampling == 'bootstrap' :
             # resampling via 'boostrap'
                 
-            btspsample1 = bootstrap(sample1, b1, nsamp)
-            btspsample2 = bootstrap(sample2, b2, nsamp)
+            btspsample1 = bootstrap(sample1, b1, nboot)
+            btspsample2 = bootstrap(sample2, b2, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -242,7 +235,7 @@ class test_sd :
         
         elif resampling == "paired_bootstrap" :
                         
-            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
+            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -311,20 +304,13 @@ class test_sd_contact :
   
     """
 
-    Stochastic Dominance Testing in Linton, Song and Whang (2010 J.Econometrics, LSW)
+    Stochastic Dominance Testing by Linton, Song and Whang (2010 J.Econometrics, LSW)
 
     L-2 type Test Statistic 
     Contact-set estimation is used for constructing resampled statistics
     
     H0 : the sample1 's'th-order stochastically dominates the sample2
     H1 : the negation of H0
-    
-    <=> 
-    
-    H0 : d_s <= 0 
-    H1 : d_s > 0
-    
-    In here, we follow the notation in LSW
 
     Parameters
     ==============================
@@ -341,13 +327,12 @@ class test_sd_contact :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
+                resampling should be one of 'bootstrap' and 'paired_bootstrap'   
                 
-                'subsampling' -> use sumbsampling method as in LMW
                 'bootstrap'   -> use recentered bootstrap method as in BD and LMW
                 'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
-    nsamp   : int
+    nboot   : int
                 # of bootstraping (default value: 200)
     
     c       : float
@@ -355,13 +340,13 @@ class test_sd_contact :
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200, c = 0.75) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, nboot = 200, c = 0.75) :
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.nsamp       = nsamp
+        self.nboot       = nboot
         self.n1          = sample1.shape[0]   
         self.n2          = sample2.shape[0]   
         self.resampling  = resampling
@@ -415,7 +400,7 @@ class test_sd_contact :
         b1          = self.b1
         b2          = self.b2
         resampling  = self.resampling
-        nsamp       = self.nsamp
+        nboot       = self.nboot
         c           = self.c
         
         start_time = time.time()
@@ -427,20 +412,18 @@ class test_sd_contact :
         pval = (test_stat_b >= test_stat).mean(0) 
         
         if s == 1:
-            Torder = 'First Order SDes'
+            Torder = 'First Order SD'
         elif s == 2:
-            Torder = 'Second Order SDes'
+            Torder = 'Second Order SD'
         elif s == 3:
-            Torder = 'Third Order SDes'
+            Torder = 'Third Order SD'
         else:
             Torder = str(s) + 'th order SDes'
     
     
         print('\n#-------------------------------------------#')    
-        print('Testing Stochastic Dominance by the Contact Set Estimation',
-          '\n\n* H0 : sample1 ', Torder, 'sample2')
-        print('Linton, Song, and Whang (2010, LSW)')    
-        
+        print('Testing for Stochastic Dominance by Contact Set Approach',
+          '\n\n* H0 : sample1 ', Torder, 'sample2')        
         print('* Resampling method \t:', resampling)
         print('\n')
         
@@ -450,7 +433,7 @@ class test_sd_contact :
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nboot )
         print('#-------------------------------------------#\n')    
         print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
@@ -548,7 +531,7 @@ class test_sd_contact :
         b1         = self.b1
         b2         = self.b2
         resampling = self.resampling
-        nsamp      = self.nsamp
+        nboot      = self.nboot
         
         contact_set_estimation = self.contact_set_estimation
         n1                     = self.n1
@@ -577,7 +560,7 @@ class test_sd_contact :
             D_sub = CDF(subsample1, grid, s) - CDF(subsample2, grid, s) # ngrid x N-b+1
             
             # generate contact_set_rep for bootstrap sample
-            # contact_set_rep is ngrid x nsamp dimension
+            # contact_set_rep is ngrid x nboot dimension
             
             contact_set_rep = np.repeat(contact_set,nsub) # (ngrid * nsub) x 1
             contact_set_rep = np.reshape(contact_set_rep, [ngrid, nsub]) # ngrid x nsub
@@ -592,8 +575,8 @@ class test_sd_contact :
         elif resampling == 'bootstrap' :
             # resampling via 'boostrap'
                 
-            btspsample1 = bootstrap(sample1, b1, nsamp)
-            btspsample2 = bootstrap(sample2, b2, nsamp)
+            btspsample1 = bootstrap(sample1, b1, nboot)
+            btspsample2 = bootstrap(sample2, b2, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -606,20 +589,20 @@ class test_sd_contact :
             D_btsp = D1_recentered - D2_recentered
         
             # generate contact_set_rep for bootstrap sample
-            # contact_set_rep is ngrid x nsamp dimension
+            # contact_set_rep is ngrid x nboot dimension
             
-            contact_set_rep = np.repeat(contact_set,nsamp) # (ngrid * nsamp) x 1
-            contact_set_rep = np.reshape(contact_set_rep, [ngrid, nsamp]) # ngrid x nsamp
+            contact_set_rep = np.repeat(contact_set,nboot) # (ngrid * nboot) x 1
+            contact_set_rep = np.reshape(contact_set_rep, [ngrid, nboot]) # ngrid x nboot
 
             D_btsp_contact = D_btsp[contact_set_rep]
-            D_btsp_contact = np.reshape(D_btsp_contact,[ct_num,nsamp])
+            D_btsp_contact = np.reshape(D_btsp_contact,[ct_num,nboot])
             
             # take supremum over support
             return (n1 * n2 / (n1 + n2)) * np.trapz(((D_btsp_contact>0) * D_btsp_contact)**(2),axis=0)[:,None]
         
         elif resampling == "paired_bootstrap" :
                         
-            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
+            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -632,13 +615,13 @@ class test_sd_contact :
             D_btsp = D1_recentered - D2_recentered
             
             # generate contact_set_rep for bootstrap sample
-            # contact_set_rep is ngrid x nsamp dimension
+            # contact_set_rep is ngrid x nboot dimension
             
-            contact_set_rep = np.repeat(contact_set,nsamp) # (ngrid * nsamp) x 1
-            contact_set_rep = np.reshape(contact_set_rep, [ngrid, nsamp]) # ngrid x nsamp
+            contact_set_rep = np.repeat(contact_set,nboot) # (ngrid * nsamp) x 1
+            contact_set_rep = np.reshape(contact_set_rep, [ngrid, nboot]) # ngrid x nsamp
 
             D_btsp_contact = D_btsp[contact_set_rep]
-            D_btsp_contact = np.reshape(D_btsp_contact,[ct_num,nsamp])
+            D_btsp_contact = np.reshape(D_btsp_contact,[ct_num,nboot])
                         
             # take supremum over support
             return (n1 * n2 / (n1 + n2)) * np.trapz(((D_btsp_contact>0) * D_btsp_contact)**(2),axis=0)[:,None]
@@ -697,18 +680,13 @@ class test_sd_SR :
   
     """
 
-    Stochastic Dominance Testing in Donald and Hsu (2014, Econemtrics Review)
+    Stochastic Dominance Testing by Donald and Hsu (2016, Econemtrics Review)
 
     KS-type Test Statistic 
-    Selective recentering approach
+    with the Selective recentering approach
     
     H0 : the sample1 's'th-order stochastically dominates the sample2
     H1 : the negation of H0
-    
-    <=> 
-    
-    H0 : d_s <= 0 
-    H1 : d_s > 0
     
     Parameters
     ==============================
@@ -725,13 +703,12 @@ class test_sd_SR :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
+                resampling should be one of 'bootstrap' and 'paired_bootstrap'   
                 
-                'subsampling' -> use sumbsampling method as in LMW
                 'bootstrap'   -> use recentered bootstrap method as in BD and LMW
                 'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
-    nsamp   : int
+    nboot   : int
                 # of bootstrap statistics for bootstrap distribution   
     a       : float
                 Tuning parameter for selective-recentering approach. (default value: 0.1)
@@ -740,13 +717,13 @@ class test_sd_SR :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200, a = 0.1, eta = 10**(-6)):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, nboot = 200, a = 0.1, eta = 10**(-6)):
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.nsamp       = nsamp
+        self.nboot       = nboot
         
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
@@ -801,7 +778,7 @@ class test_sd_SR :
         b1          = self.b1
         b2          = self.b2
         resampling  = self.resampling
-        nsamp       = self.nsamp
+        nboot       = self.nboot
         a           = self.a
         eta         = self.eta
         
@@ -829,7 +806,7 @@ class test_sd_SR :
     
 
         print('\n#-------------------------------------------#')    
-        print('Testing Stochastic Dominance by Selective Recentering Approach (Donald and Hsu 2016)',
+        print('Testing for Stochastic Dominance by Selective Recentering Approach',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
         
         print('* Resampling method \t:', resampling)
@@ -841,7 +818,7 @@ class test_sd_SR :
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nboot )
         print('#-------------------------------------------#\n')    
         print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
@@ -939,7 +916,7 @@ class test_sd_SR :
         b1         = self.b1
         b2         = self.b2
         resampling = self.resampling
-        nsamp      = self.nsamp
+        nboot      = self.nboot
                 
 
 
@@ -973,8 +950,8 @@ class test_sd_SR :
         elif resampling == 'bootstrap' :
             # resampling via 'boostrap'
                 
-            btspsample1 = bootstrap(sample1, b1, nsamp)
-            btspsample2 = bootstrap(sample2, b2, nsamp)
+            btspsample1 = bootstrap(sample1, b1, nboot)
+            btspsample2 = bootstrap(sample2, b2, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -992,7 +969,7 @@ class test_sd_SR :
         
         elif resampling == "paired_bootstrap" :
                         
-            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
+            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -1057,15 +1034,10 @@ class test_sd_NDM :
   
     """
 
-    Stochastic Dominance Testing via Numerical Delta Method (Hong and Li, 2019)
+    Stochastic Dominance Testing via Numerical Delta Method (Dumbgen 1993, Fang and Santos 2019, Hong and Li, 2018)
    
     H0 : the sample1 's'th-order stochastically dominates the sample2
     H1 : the negation of H0
-    
-    <=> 
-    
-    H0 : d_s <= 0 
-    H1 : d_s > 0
     
     Parameters
     ==============================
@@ -1082,13 +1054,11 @@ class test_sd_NDM :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
-                
-                'subsampling' -> use sumbsampling method as in LMW
+                resampling should be one of 'bootstrap' and 'paired_bootstrap'   
                 'bootstrap'   -> use recentered bootstrap method as in BD and LMW
                 'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
-    nsamp   : int
+    nboot   : int
                 # of bootstrap statistics for bootstrap distribution
     
     epsilon : float
@@ -1103,13 +1073,13 @@ class test_sd_NDM :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nsamp = 200, epsilon = None, form = "KS"):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, nboot = 200, epsilon = None, form = "L1"):
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
-        self.nsamp       = nsamp
+        self.nboot       = nboot
         
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
@@ -1173,7 +1143,7 @@ class test_sd_NDM :
         b1          = self.b1
         b2          = self.b2
         resampling  = self.resampling
-        nsamp       = self.nsamp
+        nboot       = self.nboot
         epsilon     = self.epsilon
         
         start_time = time.time()
@@ -1197,7 +1167,7 @@ class test_sd_NDM :
     
 
         print('\n#-------------------------------------------#')    
-        print('Testing Stochastic Dominance by Numerical Delta Method (Hong and Li 2018)',
+        print('Testing for Stochastic Dominance by Numerical Delta Method',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
         
         print('* Resampling method \t:', resampling)
@@ -1210,7 +1180,7 @@ class test_sd_NDM :
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nsamp )
+            print('* # of bootstrapping: ', nboot )
             
         print('#-------------------------------------------#\n')    
         print('* SD order \t\t = %6d' % s,
@@ -1348,7 +1318,7 @@ class test_sd_NDM :
         b1         = self.b1
         b2         = self.b2
         resampling = self.resampling
-        nsamp      = self.nsamp
+        nboot      = self.nboot
         NDM = self.NDM
         
         
@@ -1373,8 +1343,8 @@ class test_sd_NDM :
         elif resampling == 'bootstrap' :
             # resampling via 'boostrap'
                 
-            btspsample1 = bootstrap(sample1, b1, nsamp)
-            btspsample2 = bootstrap(sample2, b2, nsamp)
+            btspsample1 = bootstrap(sample1, b1, nboot)
+            btspsample2 = bootstrap(sample2, b2, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]
@@ -1393,7 +1363,7 @@ class test_sd_NDM :
             
             paired_bootstrap = self.paired_bootstrap
             
-            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nsamp)
+            btspsample1, btspsample2 = paired_bootstrap(sample1,sample2, b1, nboot)
             
             if sample1.ndim != 3:       
                 sample1 = sample1[:,None,None]

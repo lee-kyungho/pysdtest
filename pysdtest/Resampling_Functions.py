@@ -2,7 +2,7 @@
 Resampling Functions 
 
 @Author: Kyungho Lee
-Latest Update at July 19th 2021
+Latest Update at Aug 12th 2022
 """
 
 # Import Modules
@@ -37,7 +37,7 @@ def subsampling(sample, subsize, nsub):
     return subsample
 
 #%%
-def bootstrap(sample, b, nbtsp):
+def bootstrap(sample, b, nboot):
             
     """
         
@@ -47,7 +47,7 @@ def bootstrap(sample, b, nbtsp):
     ==============================
     sample   : np.array (1-d)
     btspsize : number of samples chosen by bootstrapping
-    nbtsp    : number of bootstrap test statistics
+    nboot    : number of bootstrap test statistics
         
     Returns
     ==============================
@@ -56,15 +56,15 @@ def bootstrap(sample, b, nbtsp):
     """
         
     n = sample.shape[0]
-    # nbtsp : # of bootsrap samples
+    # nboot : # of bootsrap samples
     # btspindex : bootsrap size x 1 x nsamp
-    btspindex = np.array([np.random.randint(n, size=b) for _ in np.arange(nbtsp)]).T[:,None,:]
+    btspindex = np.array([np.random.randint(n, size=b) for _ in np.arange(nboot)]).T[:,None,:]
     # btspsample : bootstrap size x 1 x nbtsp x 1 
     btspsample = sample[btspindex]
     return btspsample
         
 #%%    
-def paired_bootstrap(sample1, sample2, b, nbtsp):
+def paired_bootstrap(sample1, sample2, b, nboot):
         
     """
         
@@ -75,18 +75,18 @@ def paired_bootstrap(sample1, sample2, b, nbtsp):
     sample1  : (1-dim) numpy array
     sample2  : (1-dim) numpy array
     btspsize : number of samples chosen by bootstrapping
-    nbtsp    : number of bootstrap test statistics
+    nboot    : number of bootstrap test statistics
 
     ==============================
-    btspsample : (N x nbtsp) numpy array
+    btspsample : (N x nboot) numpy array
         
     """
         
     n = sample1.shape[0]
-    # nbtsp : # of bootsrap samples
+    # nboot : # of bootsrap samples
     # btspindex : bootsrap size x 1 x nsamp
-    btspindex = np.array([np.random.randint(n, size=b) for _ in np.arange(nbtsp)]).T[:,None,:]
-    # btspsample : bootstrap size x 1 x nbtsp x 1 
+    btspindex = np.array([np.random.randint(n, size=b) for _ in np.arange(nboot)]).T[:,None,:]
+    # btspsample : bootstrap size x 1 x nboot x 1 
     btspsample1 = sample1[btspindex]
     btspsample2 = sample2[btspindex]
         
