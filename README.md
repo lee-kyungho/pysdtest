@@ -8,7 +8,9 @@ This package implements stochastic dominance tests proposed by [Barrett and Dona
 
 ## Paper
 
-The [paper]((https://arxiv.org/abs/2307.10694)) contains practical guidance for using **PySDTest**. In addition, we briefly give an overview about concepts of stochastic dominance and testing methods. 
+https://arxiv.org/abs/2307.10694
+
+The [paper](https://arxiv.org/abs/2307.10694) contains practical guidance for using **PySDTest**. In addition, we briefly give an overview about concepts of stochastic dominance and testing methods. 
 
 ## Features
 
