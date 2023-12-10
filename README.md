@@ -12,6 +12,10 @@ https://arxiv.org/abs/2307.10694
 
 The [paper](https://arxiv.org/abs/2307.10694) contains practical guidance for using **PySDTest**. In addition, we briefly give an overview about concepts of stochastic dominance and testing methods. 
 
+Please cite the paper when you use our package:
+
+Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2023).
+
 ## Features
 
 - Stochastic dominance (SD) testing via imposing the least favorable case (BD, LMW)
