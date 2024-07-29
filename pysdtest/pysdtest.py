@@ -122,21 +122,21 @@ class test_sd :
         else:
             Torder = str(s) + 'th order SD'
     
-        print('\n#-------------------------------------------#')    
+        print('#-------------------------------------------#')    
         print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
-        print('\n#-------------------------------------------#')    
+        print('#-------------------------------------------#')    
         print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('* SD order       \t = %6d' % s,
+        print('* SD order       \t = %6d' % s)
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
           '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1,
-              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # ('+ resampling + '1) \t = %6d' % b1)
+            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nboot )
-          '\n* # of grid points \t = %6d\n' % ngrid)
+            print('* # of bootstrapping: ', nboot)
+            print('* # of grid points \t = %6d\n' % ngrid)
         print('#-------------------------------------------#\n')    
         print('*** Test Result ***')    
         print('* Test statistic \t = %5.4f' % test_stat)
@@ -425,22 +425,23 @@ class test_sd_contact:
             Torder = str(s) + 'th order SDes'
     
         
-        print('\n#-------------------------------------------#')    
+        
+        print('#-------------------------------------------#')    
         print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
-        print('* Contact Set Approach')
-        print('\n#-------------------------------------------#')    
+        print('Contact Set Approach')
+        print('#-------------------------------------------#')    
         print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('* SD order       \t = %6d' % s,
+        print('* SD order       \t = %6d' % s)
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
           '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1,
-              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # ('+ resampling + '1) \t = %6d' % b1)
+            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nboot )
-          '\n* # of grid points \t = %6d\n' % ngrid)
+            print('* # of bootstrapping: ', nboot)
+            print('* # of grid points \t = %6d\n' % ngrid)
         print("# Tuning parameter -------")
         print("* c              \t = %5.4f" % c)
         print('#-------------------------------------------#\n')    
@@ -813,23 +814,22 @@ class test_sd_SR :
             Torder = str(s) + 'th order SD'
     
     
-
-        print('\n#-------------------------------------------#')    
+        print('#-------------------------------------------#')    
         print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
         print('* Selective Recentering Approach')
-        print('\n#-------------------------------------------#')    
+        print('#-------------------------------------------#')    
         print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('* SD order       \t = %6d' % s,
+        print('* SD order       \t = %6d' % s)
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
-          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
+             '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1,
-              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # ('+ resampling + '1) \t = %6d' % b1)
+            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nboot )
-          '\n* # of grid points \t = %6d\n' % ngrid)
+            print('* # of bootstrapping: ', nboot)
+            print('* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeters -------------')
         print('* a              \t = %5.4f' % a)
         print('* eta            \t = %5.6f' % eta)        
@@ -1176,22 +1176,22 @@ class test_sd_NDM :
         else:
             Torder = str(s) + 'th order SD'
 
-        print('\n#-------------------------------------------#')    
+        print('#-------------------------------------------#')    
         print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
         print('* Numerical Delta Method')
-        print('\n#-------------------------------------------#')    
+        print('#-------------------------------------------#')    
         print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('* SD order       \t = %6d' % s,
+        print('* SD order       \t = %6d' % s)
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
           '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1,
-            '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # ('+ resampling + '1) \t = %6d' % b1)
+            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping: ', nboot )
-          '\n* # of grid points \t = %6d\n' % ngrid)
+            print('* # of bootstrapping: ', nboot)
+            print('* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeter -------------')
         print('* epsilon        \t = %5.4f' % epsilon)
         print('#-------------------------------------------#\n')    
