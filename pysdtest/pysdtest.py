@@ -114,11 +114,11 @@ class test_sd :
         p_val = (test_stat_b >= test_stat).mean(0) 
         
         if s == 1:
-            Torder = 'First Order SD'
+            Torder = 'first order SD'
         elif s == 2:
-            Torder = 'Second Order SD'
+            Torder = 'second order SD'
         elif s == 3:
-            Torder = 'Third Order SD'
+            Torder = 'third order SD'
         else:
             Torder = str(s) + 'th order SD'
     
@@ -132,8 +132,8 @@ class test_sd :
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
           '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1)
-            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # of ('+ resampling + '1) \t = %6d' % b1)
+            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
             print('* # of bootstrapping \t = ', nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
@@ -148,7 +148,7 @@ class test_sd :
         print('* Time elapsed : %5.2f Sec' % et)            
     
         # save the results
-        self.result = {'test_stat'   : test_stat,
+        self.result = {'test_stat'   : test_stat.reshape(-1)[0],
                    'test_stat_b' : np.squeeze(test_stat_b),
                    'critical_val' : critival_val,
                    'p_val'        : p_val[0]
@@ -416,15 +416,14 @@ class test_sd_contact:
         
         
         if s == 1:
-            Torder = 'First Order SD'
+            Torder = 'first order SD'
         elif s == 2:
-            Torder = 'Second Order SD'
+            Torder = 'second order SD'
         elif s == 3:
-            Torder = 'Third Order SD'
+            Torder = 'third order SD'
         else:
             Torder = str(s) + 'th order SDes'
     
-        
         
         print('#-------------------------------------------#\n')    
         print('Testing for Stochastic Dominance',
@@ -437,10 +436,10 @@ class test_sd_contact:
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
           '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1)
-            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # of ('+ resampling + '1) \t = %6d' % b1)
+            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t = ', nboot)
+            print('* # of bootstrapping \t = %6d ', nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print("# Tuning parameter -------")
         print("* c              \t = %5.4f\n" % c)
@@ -454,7 +453,7 @@ class test_sd_contact:
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
-        self.result = {'test_stat'   : test_stat[0,0] ,
+        self.result = {'test_stat'   : test_stat.reshape(-1)[0] ,
                    'test_stat_b' : np.squeeze(test_stat_b),
                    'critical_val' : critival_val,
                    'p_val'        : p_val[0]
@@ -826,10 +825,10 @@ class test_sd_SR :
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
              '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1)
-            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # of ('+ resampling + '1) \t = %6d' % b1)
+            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t =', nboot)
+            print('* # of bootstrapping \t = %6d', nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeters -------------')
         print('* a              \t = %5.4f' % a)
@@ -844,8 +843,8 @@ class test_sd_SR :
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
-        self.result = {'test_stat'   : test_stat,
-                   'test_stat_b' : np.squeeze(test_stat_b),
+        self.result = {'test_stat': test_stat.reshape(-1)[0],
+                   'test_stat_b'  : np.squeeze(test_stat_b),
                    'critical_val' : critival_val,
                    'p_val'        : p_val[0]
                    }
@@ -1191,7 +1190,7 @@ class test_sd_NDM :
             print('* # ('+ resampling + '1) \t = %6d' % b1)
             print('* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t =', nboot)
+            print('* # of bootstrapping \t = %6d', nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeter -------------')
         print('* epsilon        \t = %5.4f\n' % epsilon)
@@ -1205,7 +1204,7 @@ class test_sd_NDM :
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
-        self.result = {'test_stat'   : test_stat,
+        self.result = {'test_stat'   : test_stat.reshape(-1)[0],
                    'test_stat_b' : np.squeeze(test_stat_b),
                    'critical_val' : critival_val,
                    'p_val'        : p_val[0]
