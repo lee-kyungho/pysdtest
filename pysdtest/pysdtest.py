@@ -39,7 +39,6 @@ class test_sd :
     resampling : str
                
                 resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
-                
                 'subsampling'       -> use sumbsampling method as in LMW
                 'bootstrap'         -> use recentered bootstrap method
                 'paired_bootstrap'  -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
@@ -122,9 +121,8 @@ class test_sd :
         else:
             Torder = str(s) + 'th order SD'
     
-        print('#-------------------------------------------#\n')    
-        print('Testing for Stochastic Dominance',
-          '\n* H0 : sample1 ', Torder, 'sample2\n')
+        print('#--- Testing for Stochastic Dominance  -----#\n')    
+        print('* H0 : sample1', Torder, 'sample2\n')
         print('#-------------------------------------------#\n')    
         print('*** Test Setting ***')    
         print('* Resampling method \t =', resampling)
@@ -135,15 +133,14 @@ class test_sd :
             print('* # of ('+ resampling + '1) \t = %6d' % b1)
             print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t = ', nboot)
+            print('* # of bootstrapping \t = %6d' % nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print('#-------------------------------------------#\n')    
         print('*** Test Result ***')    
         print('* Test statistic \t = %5.4f' % test_stat)
         print('* Significance level \t = %5.2f' % alpha)
         print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f\n' % p_val)
-        print('#-------------------------------------------#\n')    
+        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
@@ -327,10 +324,11 @@ class test_sd_contact:
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'bootstrap' and 'paired_bootstrap'   
-                
-                'bootstrap'   -> use recentered bootstrap method as in BD and LMW
-                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
+
+                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
+                'subsampling'       -> use sumbsampling method as in LMW
+                'bootstrap'         -> use recentered bootstrap method
+                'paired_bootstrap'  -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nboot   : int
                 # of bootstraping (default value: 200)
@@ -422,12 +420,11 @@ class test_sd_contact:
         elif s == 3:
             Torder = 'third order SD'
         else:
-            Torder = str(s) + 'th order SDes'
+            Torder = str(s) + 'th order SD'
     
         
-        print('#-------------------------------------------#\n')    
-        print('Testing for Stochastic Dominance',
-          '\n* H0 : sample1 ', Torder, 'sample2')
+        print('#--- Testing for Stochastic Dominance  -----#\n')    
+        print('* H0 : sample1', Torder, 'sample2')
         print('* Contact Set Approach\n')
         print('#-------------------------------------------#\n')    
         print('*** Test Setting ***')    
@@ -439,7 +436,7 @@ class test_sd_contact:
             print('* # of ('+ resampling + '1) \t = %6d' % b1)
             print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t = %6d ', nboot)
+            print('* # of bootstrapping \t = %6d' % nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print("# Tuning parameter -------")
         print("* c              \t = %5.4f\n" % c)
@@ -448,8 +445,7 @@ class test_sd_contact:
         print('* Test statistic \t = %5.4f' % test_stat)
         print('* Significance level \t = %5.2f' % alpha)
         print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f\n' % p_val)
-        print('#-------------------------------------------#\n')    
+        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
@@ -707,10 +703,11 @@ class test_sd_SR :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'bootstrap' and 'paired_bootstrap'   
-                
-                'bootstrap'   -> use recentered bootstrap method as in BD and LMW
-                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
+
+                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
+                'subsampling'       -> use sumbsampling method as in LMW
+                'bootstrap'         -> use recentered bootstrap method
+                'paired_bootstrap'  -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nboot   : int
                 # of bootstrap statistics for bootstrap distribution   
@@ -814,9 +811,8 @@ class test_sd_SR :
             Torder = str(s) + 'th order SD'
     
     
-        print('#-------------------------------------------#\n')    
-        print('Testing for Stochastic Dominance',
-          '\n* H0 : sample1 ', Torder, 'sample2')
+        print('#--- Testing for Stochastic Dominance  -----#\n')    
+        print('* H0 : sample1', Torder, 'sample2')
         print('* Selective Recentering Approach\n')
         print('#-------------------------------------------#\n')    
         print('*** Test Setting ***')    
@@ -828,7 +824,7 @@ class test_sd_SR :
             print('* # of ('+ resampling + '1) \t = %6d' % b1)
             print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t = %6d', nboot)
+            print('* # of bootstrapping \t = %6d' % nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeters -------------')
         print('* a              \t = %5.4f' % a)
@@ -838,8 +834,7 @@ class test_sd_SR :
         print('* Test statistic \t = %5.4f' % test_stat)
         print('* Significance level \t = %5.2f' % alpha)
         print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f\n' % p_val)
-        print('#-------------------------------------------#\n')    
+        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
@@ -1063,9 +1058,11 @@ class test_sd_NDM :
     b2      : int
                 resampling size of the sample2.
     resampling : str
-                resampling should be one of 'bootstrap' and 'paired_bootstrap'   
-                'bootstrap'   -> use recentered bootstrap method as in BD and LMW
-                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
+    
+                resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
+                'subsampling'       -> use sumbsampling method as in LMW
+                'bootstrap'         -> use recentered bootstrap method
+                'paired_bootstrap'  -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nboot   : int
                 # of bootstrap statistics for bootstrap distribution
@@ -1176,9 +1173,8 @@ class test_sd_NDM :
         else:
             Torder = str(s) + 'th order SD'
 
-        print('#-------------------------------------------#\n')    
-        print('Testing for Stochastic Dominance',
-          '\n* H0 : sample1 ', Torder, 'sample2')
+        print('#--- Testing for Stochastic Dominance  -----#\n')    
+        print('* H0 : sample1', Torder, 'sample2')
         print('* Numerical Delta Method\n')
         print('#-------------------------------------------#\n')    
         print('*** Test Setting ***')    
@@ -1187,10 +1183,10 @@ class test_sd_NDM :
         print('* # of (sample1) \t = %6d' % sample1.shape[0],
           '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
-            print('* # ('+ resampling + '1) \t = %6d' % b1)
-            print('* # ('+ resampling + '2) \t = %6d\n' % b2)
+            print('* # of ('+ resampling + '1) \t = %6d' % b1)
+            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
         else:
-            print('* # of bootstrapping \t = %6d', nboot)
+            print('* # of bootstrapping \t = %6d' % nboot)
             print('* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeter -------------')
         print('* epsilon        \t = %5.4f\n' % epsilon)
@@ -1199,8 +1195,7 @@ class test_sd_NDM :
         print('* Test statistic \t = %5.4f' % test_stat)
         print('* Significance level \t = %5.2f' % alpha)
         print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f\n' % p_val)
-        print('#-------------------------------------------#\n')    
+        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
         print('* Time elapsed : %5.2f Sec' % et)            
     
