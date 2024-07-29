@@ -17,10 +17,8 @@ class test_sd :
     
     """
 
-    Stochastic Dominance Test by Barett and Donald (2003 ECMA, hereafter BD), Linton, Maasoumi and Whang (2005 RES, hereafter LMW)
+    Stochastic Dominance Test by Barett and Donald (2003 ECMA, hereafter BD), Linton, Maasoumi and Whang (2005 RESstud, hereafter LMW)
 
-    Kolmogorov-Smirnov type Test Statistic via imposing the Least Favorable Case
-    
     H0 : the sample1 's'th-order stochastically dominates the sample2
     H1 : the negation of H0
     
@@ -42,16 +40,16 @@ class test_sd :
                
                 resampling should be one of 'subsampling', 'bootstrap', and 'paired_bootstrap'   
                 
-                'subsampling' -> use sumbsampling method as in LMW
-                'bootstrap'   -> use recentered bootstrap method as in BD
-                'paired_bootstrap' -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
+                'subsampling'       -> use sumbsampling method as in LMW
+                'bootstrap'         -> use recentered bootstrap method
+                'paired_bootstrap'  -> use recentered bootstrap method by resampling a pair (X,Y) to allow dependency of paired observations.
                 
     nboot   : int
-                # of bootstrap statistics for bootstrap distribution
+                # of bootstrap statistics for the bootstrap distribution
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, alpha = 0.05) :
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -59,6 +57,7 @@ class test_sd :
         self.s           = s
         self.resampling  = resampling
         self.nboot       = nboot
+        self.alpha       = alpha
         
         # set grid
         samples = [sample1, sample2]
@@ -87,10 +86,10 @@ class test_sd :
                 the value of the test statistic
         test_stat_b : numpy array
                 values of the resampled test statistics
+        critival_val: float
+                critical value of the test
         pval        : float
                 p-value of the test
-        
-        
         
         """
         
@@ -103,14 +102,16 @@ class test_sd :
         resampling  = self.resampling
         nboot       = self.nboot
         
-        
         start_time = time.time()
         
         # Estimation
         test_stat   = self.T_N()
         test_stat_b = self.resampled_stat()
         
-        pval = (test_stat_b >= test_stat).mean(0) 
+        # calculate critical value and p-value
+        alpha = self.alpha
+        critival_val = np.quantile(test_stat_b, 1 - alpha)
+        p_val = (test_stat_b >= test_stat).mean(0) 
         
         if s == 1:
             Torder = 'First Order SD'
@@ -121,37 +122,36 @@ class test_sd :
         else:
             Torder = str(s) + 'th order SD'
     
-    
-
         print('\n#-------------------------------------------#')    
         print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
-        
+        print('\n#-------------------------------------------#')    
+        print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('\n')
-        
-        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('* SD order       \t = %6d' % s,
+        print('* # of (sample1) \t = %6d' % sample1.shape[0],
+          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
             print('* # of bootstrapping: ', nboot )
-        print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('#-------------------------------------------#\n')    
-        print('* Test Result *\n')    
-
-        print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t = %5.4f\n' % pval)
+        print('*** Test Result ***')    
+        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Significance level \t = %5.4f' % alpha)
+        print('* Critical-value \t = %5.4f\n' % critival_val)
+        print('* P-value        \t = %5.4f\n' % p_val)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
     
+        # save the results
         self.result = {'test_stat'   : test_stat[0,0] ,
                    'test_stat_b' : np.squeeze(test_stat_b),
-                   'pval'        : pval[0]
+                   'critical_val' : critival_val,
+                   'p_val'        : p_val[0]
                    }
         
     
@@ -300,7 +300,7 @@ class test_sd :
         plt.show()
         
 #%%        
-class test_sd_contact :
+class test_sd_contact:
   
     """
 
@@ -340,7 +340,7 @@ class test_sd_contact :
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, nboot = 200, c = 0.75) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, c = 0.75, alpha = 0.05) :
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -350,7 +350,7 @@ class test_sd_contact :
         self.n1          = sample1.shape[0]   
         self.n2          = sample2.shape[0]   
         self.resampling  = resampling
-
+        self.alpha       = alpha
 
         # setting grid
         samples = [sample1, sample2]
@@ -382,14 +382,14 @@ class test_sd_contact :
         Returns
         ==============================
             
-        test_stat   : float
+        test_stat    : float
                 the value of the test statistic
-        test_stat_b : numpy array
+        test_stat_b  : numpy array
                 values of the resampled test statistics
-        pval        : float
+        critival_val : float
+                critical value of the test
+        p_val         : float
                 p-value of the test
-        
-        
         
         """
         
@@ -409,7 +409,11 @@ class test_sd_contact :
         test_stat   = self.T_N()
         test_stat_b = self.resampled_stat()
         
-        pval = (test_stat_b >= test_stat).mean(0) 
+        # calculate critical value and p-value
+        alpha = self.alpha
+        critival_val = np.quantile(test_stat_b, 1 - alpha)
+        p_val = (test_stat_b >= test_stat).mean(0) 
+        
         
         if s == 1:
             Torder = 'First Order SD'
@@ -420,37 +424,39 @@ class test_sd_contact :
         else:
             Torder = str(s) + 'th order SDes'
     
-    
-        print('\n#-------------------------------------------#')    
-        print('Testing for Stochastic Dominance by Contact Set Approach',
-          '\n\n* H0 : sample1 ', Torder, 'sample2')        
-        print('* Resampling method \t:', resampling)
-        print('\n')
         
-        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('\n#-------------------------------------------#')    
+        print('Testing for Stochastic Dominance',
+          '\n\n* H0 : sample1 ', Torder, 'sample2')
+        print('* Contact Set Approach')
+        print('\n#-------------------------------------------#')    
+        print('*** Test Setting ***')    
+        print('* Resampling method \t:', resampling)
+        print('* SD order       \t = %6d' % s,
+        print('* # of (sample1) \t = %6d' % sample1.shape[0],
+          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
             print('* # of bootstrapping: ', nboot )
-        print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print("# Tuning parameter -------")
-        print("* c = %5.4f" % c)
+        print("* c              \t = %5.4f" % c)
         print('#-------------------------------------------#\n')    
-        print('* Test Result *\n')    
-
-        print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t = %5.4f\n' % pval)
+        print('*** Test Result ***')    
+        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Significance level \t = %5.4f' % alpha)
+        print('* Critical-value \t = %5.4f\n' % critival_val)
+        print('* P-value        \t = %5.4f\n' % p_val)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
     
         self.result = {'test_stat'   : test_stat[0,0] ,
                    'test_stat_b' : np.squeeze(test_stat_b),
-                   'pval'        : pval[0]
+                   'critical_val' : critival_val,
+                   'p_val'        : p_val[0]
                    }
         
         
@@ -682,8 +688,7 @@ class test_sd_SR :
 
     Stochastic Dominance Testing by Donald and Hsu (2016, Econemtrics Review)
 
-    KS-type Test Statistic 
-    with the Selective recentering approach
+    KS-type Test Statistic with the Selective recentering approach
     
     H0 : the sample1 's'th-order stochastically dominates the sample2
     H1 : the negation of H0
@@ -693,7 +698,6 @@ class test_sd_SR :
     sample1 : np.array (1-d)
     sample2 : np.array (1-d)
                 input samples should be 1-dim np.array
-    
     grid    : int
                 # of grid points
     s       : int
@@ -717,7 +721,7 @@ class test_sd_SR :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, nboot = 200, a = 0.1, eta = 10**(-6)):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, a = 0.1, eta = 10**(-6), alpha = 0.05):
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -759,15 +763,16 @@ class test_sd_SR :
         """
         
         Returns
-        ==============================            
-        test_stat   : float
+        ==============================
+            
+        test_stat    : float
                 the value of the test statistic
-        test_stat_b : numpy array
+        test_stat_b  : numpy array
                 values of the resampled test statistics
-        pval        : float
+        critival_val : float
+                critical value of the test
+        p_val         : float
                 p-value of the test
-        
-        
         
         """
         
@@ -792,7 +797,11 @@ class test_sd_SR :
         test_stat_b = self.resampled_stat()
         test_stat_b[test_stat_b <= 10**(-6)] = 10**(-6)
         
-        pval = (test_stat_b >= test_stat).mean(0) 
+        # calculate critical value and p-value
+        alpha = self.alpha
+        critival_val = np.quantile(test_stat_b, 1 - alpha)
+        p_val = (test_stat_b >= test_stat).mean(0) 
+        
         
         if s == 1:
             Torder = 'First Order SD'
@@ -806,40 +815,40 @@ class test_sd_SR :
     
 
         print('\n#-------------------------------------------#')    
-        print('Testing for Stochastic Dominance by Selective Recentering Approach',
+        print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
-        
+        print('* Selective Recentering Approach')
+        print('\n#-------------------------------------------#')    
+        print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('\n')
-        
-        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
+        print('* SD order       \t = %6d' % s,
+        print('* # of (sample1) \t = %6d' % sample1.shape[0],
+          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
               '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
             print('* # of bootstrapping: ', nboot )
-        print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
         print('# Tuning paremeters -------------')
-        print('* a   = %5.4f' % a)
-        print('* eta = %5.6f' % eta)
+        print('* a              \t = %5.4f' % a)
+        print('* eta            \t = %5.6f' % eta)        
         print('#-------------------------------------------#\n')    
-        print('* Test Result *\n')    
-
-        print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t = %5.4f\n' % pval)
+        print('*** Test Result ***')    
+        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Significance level \t = %5.4f' % alpha)
+        print('* Critical-value \t = %5.4f\n' % critival_val)
+        print('* P-value        \t = %5.4f\n' % p_val)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
     
         self.result = {'test_stat'   : test_stat[0,0] ,
                    'test_stat_b' : np.squeeze(test_stat_b),
-                   'pval'        : pval[0]
+                   'critical_val' : critival_val,
+                   'p_val'        : p_val[0]
                    }
         
-
     def T_N(self):
         
         """
@@ -1073,13 +1082,14 @@ class test_sd_NDM :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, nboot = 200, epsilon = None, form = "L1"):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, epsilon = None, form = "L1", alpha = 0.05):
        
         self.sample1     = sample1
         self.sample2     = sample2
         self.ngrid       = ngrid
         self.s           = s
         self.nboot       = nboot
+        self.alpha       = alpha
         
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
@@ -1092,7 +1102,7 @@ class test_sd_NDM :
         # Tuning Parameters
 
         if epsilon == None:
-            epsilon = r_N ** (-1/16);
+            epsilon = r_N ** (-1/16)
         
         self.epsilon     = epsilon
         
@@ -1122,17 +1132,15 @@ class test_sd_NDM :
         
         Returns
         ==============================
-            None
-            In here, we print the result
             
-        test_stat   : float
+        test_stat    : float
                 the value of the test statistic
-        test_stat_b : numpy array
+        test_stat_b  : numpy array
                 values of the resampled test statistics
-        pval        : float
+        critival_val : float
+                critical value of the test
+        p_val         : float
                 p-value of the test
-        
-        
         
         """
         
@@ -1153,8 +1161,12 @@ class test_sd_NDM :
         self.test_stat = test_stat
         
         test_stat_b = self.resampled_stat()
-        pval = (test_stat_b >= test_stat).mean(0) 
-        
+
+        # calculate critical value and p-value
+        alpha = self.alpha
+        critival_val = np.quantile(test_stat_b, 1 - alpha)
+        p_val = (test_stat_b >= test_stat).mean(0) 
+                
         if s == 1:
             Torder = 'First Order SD'
         elif s == 2:
@@ -1163,44 +1175,40 @@ class test_sd_NDM :
             Torder = 'Third Order SD'
         else:
             Torder = str(s) + 'th order SD'
-    
-    
 
         print('\n#-------------------------------------------#')    
-        print('Testing for Stochastic Dominance by Numerical Delta Method',
+        print('Testing for Stochastic Dominance',
           '\n\n* H0 : sample1 ', Torder, 'sample2')
-        
+        print('* Numerical Delta Method')
+        print('\n#-------------------------------------------#')    
+        print('*** Test Setting ***')    
         print('* Resampling method \t:', resampling)
-        print('\n')
-        
-        print('* # of (sample1) \t\t = %6d' % sample1.shape[0],
-          '\n* # of (sample2) \t\t = %6d\n' % sample2.shape[0])
-        
+        print('* SD order       \t = %6d' % s,
+        print('* # of (sample1) \t = %6d' % sample1.shape[0],
+          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
         if self.resampling == 'subsampling':
             print('* # ('+ resampling + '1) \t = %6d' % b1,
-              '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
+            '\n* # ('+ resampling + '2) \t = %6d\n' % b2)
         else:
             print('* # of bootstrapping: ', nboot )
-            
-        print('#-------------------------------------------#\n')    
-        print('* SD order \t\t = %6d' % s,
           '\n* # of grid points \t = %6d\n' % ngrid)
-        print('# Tuning parameter ---------')
-        print('# epsilon = %5.4f' % epsilon)
+        print('# Tuning paremeter -------------')
+        print('* epsilon        \t = %5.4f' % epsilon)
         print('#-------------------------------------------#\n')    
-        print('* Test Result *\n')    
-
-        print('* Test statistic = %5.4f' % test_stat)
-        print('* p-value \t = %5.4f\n' % pval)
+        print('*** Test Result ***')    
+        print('* Test statistic \t = %5.4f' % test_stat)
+        print('* Significance level \t = %5.4f' % alpha)
+        print('* Critical-value \t = %5.4f\n' % critival_val)
+        print('* P-value        \t = %5.4f\n' % p_val)
         print('#-------------------------------------------#')    
         et = time.time() - start_time
         print('\n* Time elapsed : %5.2f Sec' % et)            
-        
-        self.result = {'test_stat'   : test_stat[0] ,
+    
+        self.result = {'test_stat'   : test_stat[0,0] ,
                    'test_stat_b' : np.squeeze(test_stat_b),
-                   'pval'        : pval[0]
-                   }
-        
+                   'critical_val' : critival_val,
+                   'p_val'        : p_val[0]
+                   }        
 
     def phi(self, theta):
     
