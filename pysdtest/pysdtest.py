@@ -1,8 +1,10 @@
 """
+
 @author: Kyungho Lee
-Latest Update at 9 Aug 2022
+Latest Update at July 30, 2024
 
 Python Package for Stochastic Dominance Tests
+
 """
 
 # Import modules
@@ -48,7 +50,7 @@ class test_sd :
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, alpha = 0.05) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, alpha = 0.05, quiet = False):
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -57,6 +59,7 @@ class test_sd :
         self.resampling  = resampling
         self.nboot       = nboot
         self.alpha       = alpha
+        self.quiet       = quiet
         
         # set grid
         samples = [sample1, sample2]
@@ -100,6 +103,7 @@ class test_sd :
         b2          = self.b2
         resampling  = self.resampling
         nboot       = self.nboot
+        quiet       = self.quiet
         
         start_time = time.time()
         
@@ -120,30 +124,32 @@ class test_sd :
             Torder = 'third order SD'
         else:
             Torder = str(s) + 'th order SD'
-    
-        print('#--- Testing for Stochastic Dominance  -----#\n')    
-        print('* H0 : sample1', Torder, 'sample2\n')
-        print('#-------------------------------------------#\n')    
-        print('*** Test Setting ***')    
-        print('* Resampling method \t =', resampling)
-        print('* SD order       \t = %6d' % s)
-        print('* # of (sample1) \t = %6d' % sample1.shape[0],
-          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
-        if self.resampling == 'subsampling':
-            print('* # of ('+ resampling + '1) \t = %6d' % b1)
-            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
-        else:
-            print('* # of bootstrapping \t = %6d' % nboot)
-            print('* # of grid points \t = %6d\n' % ngrid)
-        print('#-------------------------------------------#\n')    
-        print('*** Test Result ***')    
-        print('* Test statistic \t = %5.4f' % test_stat)
-        print('* Significance level \t = %5.2f' % alpha)
-        print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f' % p_val)
+
         et = time.time() - start_time
-        print('* Time elapsed : %5.2f Sec' % et)            
-    
+   
+        if quiet == False:
+            print('\n#--- Testing for Stochastic Dominance  -----#\n')    
+            print('* H0 : sample1', Torder, 'sample2\n')
+            print('#-------------------------------------------#\n')    
+            print('*** Test Setting ***')    
+            print('* Resampling method \t =', resampling)
+            print('* SD order       \t = %6d' % s)
+            print('* # of (sample1) \t = %6d' % sample1.shape[0],
+            '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
+            if self.resampling == 'subsampling':
+                print('* # of (subsample1) \t = %6d' % b1)
+                print('* # of (subsample2) \t = %6d\n' % b2)
+            else:
+                print('* # of bootstrapping \t = %6d' % nboot)
+                print('* # of grid points \t = %6d\n' % ngrid)
+            print('#-------------------------------------------#\n')    
+            print('*** Test Result ***')    
+            print('* Test statistic \t = %5.4f' % test_stat)
+            print('* Significance level \t = %5.2f' % alpha)
+            print('* Critical-value \t = %5.4f' % critival_val)
+            print('* P-value        \t = %5.4f' % p_val)
+            print('* Time elapsed   \t = %5.2f Sec' % et)            
+        
         # save the results
         self.result = {'test_stat'   : test_stat.reshape(-1)[0],
                    'test_stat_b' : np.squeeze(test_stat_b),
@@ -338,7 +344,7 @@ class test_sd_contact:
     
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, c = 0.75, alpha = 0.05) :
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, c = 0.75, alpha = 0.05, quiet = False):
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -349,6 +355,7 @@ class test_sd_contact:
         self.n2          = sample2.shape[0]   
         self.resampling  = resampling
         self.alpha       = alpha
+        self.quiet       = quiet
 
         # setting grid
         samples = [sample1, sample2]
@@ -400,7 +407,8 @@ class test_sd_contact:
         resampling  = self.resampling
         nboot       = self.nboot
         c           = self.c
-        
+        quiet       = self.quiet
+
         start_time = time.time()
         
         # Estimation
@@ -422,35 +430,36 @@ class test_sd_contact:
         else:
             Torder = str(s) + 'th order SD'
     
-        
-        print('#--- Testing for Stochastic Dominance  -----#\n')    
-        print('* H0 : sample1', Torder, 'sample2')
-        print('* Contact Set Approach\n')
-        print('#-------------------------------------------#\n')    
-        print('*** Test Setting ***')    
-        print('* Resampling method \t =', resampling)
-        print('* SD order       \t = %6d' % s)
-        print('* # of (sample1) \t = %6d' % sample1.shape[0],
-          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
-        if self.resampling == 'subsampling':
-            print('* # of ('+ resampling + '1) \t = %6d' % b1)
-            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
-        else:
-            print('* # of bootstrapping \t = %6d' % nboot)
-            print('* # of grid points \t = %6d\n' % ngrid)
-        print("# Tuning parameter -------")
-        print("* c              \t = %5.4f\n" % c)
-        print('#-------------------------------------------#\n')    
-        print('*** Test Result ***')    
-        print('* Test statistic \t = %5.4f' % test_stat)
-        print('* Significance level \t = %5.2f' % alpha)
-        print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
-        print('* Time elapsed : %5.2f Sec' % et)            
+        
+        if quiet == False:
+            print('\n#--- Testing for Stochastic Dominance  -----#\n')    
+            print('* H0 : sample1', Torder, 'sample2')
+            print('* Contact Set Approach\n')
+            print('#-------------------------------------------#\n')    
+            print('*** Test Setting ***')    
+            print('* Resampling method \t =', resampling)
+            print('* SD order       \t = %6d' % s)
+            print('* # of (sample1) \t = %6d' % sample1.shape[0],
+            '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
+            if self.resampling == 'subsampling':
+                print('* # of (subsample1) \t = %6d' % b1)
+                print('* # of (subsample2) \t = %6d\n' % b2)
+            else:
+                print('* # of bootstrapping \t = %6d' % nboot)
+                print('* # of grid points \t = %6d\n' % ngrid)
+            print("# Tuning parameter -------")
+            print("* c              \t = %5.4f\n" % c)
+            print('#-------------------------------------------#\n')    
+            print('*** Test Result ***')    
+            print('* Test statistic \t = %5.4f' % test_stat)
+            print('* Significance level \t = %5.2f' % alpha)
+            print('* Critical-value \t = %5.4f' % critival_val)
+            print('* P-value        \t = %5.4f' % p_val)
+            print('* Time elapsed   \t = %5.2f Sec' % et)            
     
-        self.result = {'test_stat'   : test_stat.reshape(-1)[0] ,
-                   'test_stat_b' : np.squeeze(test_stat_b),
+        self.result = {'test_stat': test_stat.reshape(-1)[0] ,
+                   'test_stat_b'  : np.squeeze(test_stat_b),
                    'critical_val' : critival_val,
                    'p_val'        : p_val[0]
                    }
@@ -718,7 +727,7 @@ class test_sd_SR :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, a = 0.1, eta = 10**(-6), alpha = 0.05):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, a = 0.1, eta = 10**(-6), alpha = 0.05, quiet = False):
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -726,6 +735,7 @@ class test_sd_SR :
         self.s           = s
         self.nboot       = nboot
         self.alpha       = alpha
+        self.quiet       = quiet
         
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
@@ -784,6 +794,7 @@ class test_sd_SR :
         nboot       = self.nboot
         a           = self.a
         eta         = self.eta
+        quiet       = self.quiet
         
         
         start_time = time.time()
@@ -810,33 +821,34 @@ class test_sd_SR :
         else:
             Torder = str(s) + 'th order SD'
     
-    
-        print('#--- Testing for Stochastic Dominance  -----#\n')    
-        print('* H0 : sample1', Torder, 'sample2')
-        print('* Selective Recentering Approach\n')
-        print('#-------------------------------------------#\n')    
-        print('*** Test Setting ***')    
-        print('* Resampling method \t = ', resampling)
-        print('* SD order       \t = %6d' % s)
-        print('* # of (sample1) \t = %6d' % sample1.shape[0],
-             '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
-        if self.resampling == 'subsampling':
-            print('* # of ('+ resampling + '1) \t = %6d' % b1)
-            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
-        else:
-            print('* # of bootstrapping \t = %6d' % nboot)
-            print('* # of grid points \t = %6d\n' % ngrid)
-        print('# Tuning paremeters -------------')
-        print('* a              \t = %5.4f' % a)
-        print('* eta            \t = %5.6f' % eta)        
-        print('#-------------------------------------------#\n')    
-        print('*** Test Result ***')    
-        print('* Test statistic \t = %5.4f' % test_stat)
-        print('* Significance level \t = %5.2f' % alpha)
-        print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
-        print('* Time elapsed : %5.2f Sec' % et)            
+
+        if quiet == False:
+            print('\n#--- Testing for Stochastic Dominance  -----#\n')    
+            print('* H0 : sample1', Torder, 'sample2')
+            print('* Selective Recentering Approach\n')
+            print('#-------------------------------------------#\n')    
+            print('*** Test Setting ***')    
+            print('* Resampling method \t = ', resampling)
+            print('* SD order       \t = %6d' % s)
+            print('* # of (sample1) \t = %6d' % sample1.shape[0],
+                '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
+            if self.resampling == 'subsampling':
+                print('* # of (subsample1) \t = %6d' % b1)
+                print('* # of (subsample2) \t = %6d\n' % b2)
+            else:
+                print('* # of bootstrapping \t = %6d' % nboot)
+                print('* # of grid points \t = %6d\n' % ngrid)
+            print('# Tuning paremeters -------------')
+            print('* a              \t = %5.4f' % a)
+            print('* eta            \t = %5.6f' % eta)        
+            print('#-------------------------------------------#\n')    
+            print('*** Test Result ***')    
+            print('* Test statistic \t = %5.4f' % test_stat)
+            print('* Significance level \t = %5.2f' % alpha)
+            print('* Critical-value \t = %5.4f' % critival_val)
+            print('* P-value        \t = %5.4f' % p_val)
+            print('* Time elapsed   \t = %5.2f Sec' % et)            
     
         self.result = {'test_stat': test_stat.reshape(-1)[0],
                    'test_stat_b'  : np.squeeze(test_stat_b),
@@ -1079,7 +1091,7 @@ class test_sd_NDM :
 
     """
     
-    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, epsilon = None, form = "L1", alpha = 0.05):
+    def __init__(self, sample1, sample2, ngrid, s, resampling, b1 = None, b2 = None, nboot = 200, epsilon = None, form = "L1", alpha = 0.05, quiet = False):
        
         self.sample1     = sample1
         self.sample2     = sample2
@@ -1087,7 +1099,8 @@ class test_sd_NDM :
         self.s           = s
         self.nboot       = nboot
         self.alpha       = alpha
-        
+        self.quiet       = quiet
+
         n1 = sample1.shape[0] 
         n2 = sample2.shape[0] 
         r_N =  (n1 * n2 / (n1 + n2)) ** (0.5)
@@ -1150,6 +1163,8 @@ class test_sd_NDM :
         resampling  = self.resampling
         nboot       = self.nboot
         epsilon     = self.epsilon
+        quiet       = self.quiet
+        form        = self.form
         
         start_time = time.time()
                         
@@ -1173,31 +1188,34 @@ class test_sd_NDM :
         else:
             Torder = str(s) + 'th order SD'
 
-        print('#--- Testing for Stochastic Dominance  -----#\n')    
-        print('* H0 : sample1', Torder, 'sample2')
-        print('* Numerical Delta Method\n')
-        print('#-------------------------------------------#\n')    
-        print('*** Test Setting ***')    
-        print('* Resampling method \t =', resampling)
-        print('* SD order       \t = %6d' % s)
-        print('* # of (sample1) \t = %6d' % sample1.shape[0],
-          '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
-        if self.resampling == 'subsampling':
-            print('* # of ('+ resampling + '1) \t = %6d' % b1)
-            print('* # of ('+ resampling + '2) \t = %6d\n' % b2)
-        else:
-            print('* # of bootstrapping \t = %6d' % nboot)
-            print('* # of grid points \t = %6d\n' % ngrid)
-        print('# Tuning paremeter -------------')
-        print('* epsilon        \t = %5.4f\n' % epsilon)
-        print('#-------------------------------------------#\n')    
-        print('*** Test Result ***')    
-        print('* Test statistic \t = %5.4f' % test_stat)
-        print('* Significance level \t = %5.2f' % alpha)
-        print('* Critical-value \t = %5.4f' % critival_val)
-        print('* P-value        \t = %5.4f' % p_val)
         et = time.time() - start_time
-        print('* Time elapsed : %5.2f Sec' % et)            
+
+        if quiet == False:
+            print('\n#--- Testing for Stochastic Dominance  -----#\n')    
+            print('* H0 : sample1', Torder, 'sample2')
+            print('* Numerical Delta Method')
+            print('* Type of the Test Statistic \t = ', form)
+            print('\n#-------------------------------------------#\n')    
+            print('*** Test Setting ***')    
+            print('* Resampling method \t =', resampling)
+            print('* SD order       \t = %6d' % s)
+            print('* # of (sample1) \t = %6d' % sample1.shape[0],
+            '\n* # of (sample2)   \t = %6d' % sample2.shape[0])
+            if self.resampling == 'subsampling':
+                print('* # of (subsample1) \t = %6d' % b1)
+                print('* # of (subsample2) \t = %6d\n' % b2)
+            else:
+                print('* # of bootstrapping \t = %6d' % nboot)
+                print('* # of grid points \t = %6d\n' % ngrid)
+            print('# Tuning paremeter -------------')
+            print('* epsilon        \t = %5.4f\n' % epsilon)
+            print('#-------------------------------------------#\n')    
+            print('*** Test Result ***')    
+            print('* Test statistic \t = %5.4f' % test_stat)
+            print('* Significance level \t = %5.2f' % alpha)
+            print('* Critical-value \t = %5.4f' % critival_val)
+            print('* P-value        \t = %5.4f' % p_val)
+            print('* Time elapsed   \t = %5.2f Sec' % et)            
     
         self.result = {'test_stat'   : test_stat.reshape(-1)[0],
                    'test_stat_b' : np.squeeze(test_stat_b),
