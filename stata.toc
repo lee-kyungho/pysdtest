@@ -1,0 +1,2 @@
+v 1
+d pysdtest: testing for stochastic dominance in Stata
