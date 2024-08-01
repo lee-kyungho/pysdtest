@@ -94,7 +94,7 @@ recentering method of Donald and Hsu (2016). In addition, the numerical delta me
 {p2col 5 20 24 2: Macros}{p_end}
 {synopt:{cmd:r(resampling)}}resampling method{p_end}
 {synopt:{cmd:r(approach)}}testing approach{p_end}
-{synopt:{cmd:r(form)}}type of functional for the numerical delta method{p_end}
+{synopt:{cmd:r(functional)}}type of functional for the numerical delta method{p_end}
 
 {p2col 5 20 24 2: Matrices}{p_end}
 {synopt:{cmd:r(grid)}}matrix of grid values{p_end}
