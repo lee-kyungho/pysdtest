@@ -11,16 +11,6 @@ Supported testing procedures include, but are not limited to, tests through the 
 
 We also introduce the Stata command **pysdtest** based on the python package for Stata users.
 
-## Paper
-
-https://arxiv.org/abs/2307.10694
-
-The [paper](https://arxiv.org/abs/2307.10694) contains practical guidance for using **PySDTest**. In addition, we briefly give an overview about concepts of stochastic dominance and testing methods. 
-
-If you use our package, please cite the paper:
-
-Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2023).
-
 ## Installation
 
 ### Python package
@@ -40,3 +30,21 @@ We also provide the stata command **pysdtest** that is based on the Python packa
 ```{stata}
  net install pysdtest, from("https://raw.githubusercontent.com/lee-kyungho/pysdtest/main/Stata") replace
 ```
+
+
+## Paper
+
+https://arxiv.org/abs/2307.10694
+
+The [paper](https://arxiv.org/abs/2307.10694) contains practical guidance for using **PySDTest**. In addition, we briefly give an overview about concepts of stochastic dominance and testing methods. 
+
+If you use our package, please cite the paper:
+
+Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2023).
+
+To read the help file for the Stata command **pysdtest**, execute the following command in Stata:
+
+```{stata}
+ help pysdtest
+```
+
