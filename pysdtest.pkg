@@ -1,3 +1,4 @@
-*! version 1.0.0
-d pysdtest.ado
-d pysdtest.sthlp
+v 1
+d pysdtest: testing for stochastic dominance in Stata
+f pysdtest.ado
+f pysdtest.sthlp
