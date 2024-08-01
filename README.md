@@ -4,9 +4,11 @@
 
 **PySDTest** is a Python 3 implementation of routines for Stochastic Dominance tests. This package was created by Kyungho Lee in collaboration with Yoon-Jae Whang. 
 
-Supported testing procedures include, but are not limited to, tests through the least favorable case approach of [Barrett and Donald (2003, BD)](https://doi.org/10.1111/1468-0262.00390), subsampling approach of [Linton, Maasoumi and Whang (2005, LMW)](https://ideas.repec.org/a/oup/restud/v72y2005i3p735-765.html), contact set approach of [Linton, Song and Whang (2010, LSW)](https://econpapers.repec.org/article/eeeeconom/v_3a154_3ay_3a2010_3ai_3a2_3ap_3a186-202.htm) and sele recentering method of [Donald and Hsu (2014, DH)](https://www.tandfonline.com/doi/full/10.1080/07474938.2013.833813). In addition, the numerical delta method by [(Hong and Li (2018, HL))] can be used to compute the critical value. \pkg{pysdtest} also supports the combination of various resampling methods, test statistics and procedures for approximating the limiting distribution. 
+Supported testing procedures include, but are not limited to, tests through the least favorable case approach of [Barrett and Donald (2003, BD)](https://doi.org/10.1111/1468-0262.00390), subsampling approach of [Linton, Maasoumi and Whang (2005, LMW)](https://ideas.repec.org/a/oup/restud/v72y2005i3p735-765.html), contact set approach of [Linton, Song and Whang (2010, LSW)](https://econpapers.repec.org/article/eeeeconom/v_3a154_3ay_3a2010_3ai_3a2_3ap_3a186-202.htm) and sele recentering method of [Donald and Hsu (2014, DH)](https://www.tandfonline.com/doi/full/10.1080/07474938.2013.833813). In addition, the numerical delta method by [(Hong and Li (2018, HL))] can be used to compute the critical value. 
 
-Based on the package, we also introduce the Stata command **pysdtest**.
+**PySDTest** also supports the combination of various resampling methods, test statistics and procedures for approximating the limiting distribution. Furthremore, a user can flexibly conduct a statistical test for advanced/complex hypotheses such as stochastic maximality among distributions.
+
+We also introduce the Stata command **pysdtest** based on the python package for Stata users.
 
 ## Paper
 
@@ -17,16 +19,6 @@ The [paper](https://arxiv.org/abs/2307.10694) contains practical guidance for us
 If you use our package, please cite the paper:
 
 Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2023).
-
-## Features
-
-- Stochastic dominance (SD) testing via imposing the least favorable case (BD, LMW)
-- SD testing via Contact-set approach (LSW)
-- SD testing via Selective recentering approach (DH)
-- SD testing via Numerical delta method (HL)
-- Advanced hypotheses testing (Joint hypotheses testing)
-- Plotting (s-th order) CDFs
-- Resampling: bootstrap, subsampling, and paired-bootstrap
 
 ## Installation
 
