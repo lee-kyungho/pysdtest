@@ -1,5 +1,3 @@
 *! version 1.0.0
-
-* pysdtest: testing for stochastic dominance
-pysdtest.ado
-pysdtest.sthlp
+d psydtest.ado
+d psydtest.sthlp
