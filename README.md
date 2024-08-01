@@ -2,9 +2,11 @@
 
  A Stata/Python Package for Stochastic Dominance Tests
 
-PySDTest is a Python 3 implementation of routines for Stochastic Dominance tests. This package was created by Kyungho Lee in collaboration with Yoon-Jae Whang.
+PySDTest is a Python 3 implementation of routines for Stochastic Dominance tests. This package was created by Kyungho Lee in collaboration with Yoon-Jae Whang. 
 
-This package implements stochastic dominance tests, including, but not limited to, [Barrett and Donald (2003, BD)](https://doi.org/10.1111/1468-0262.00390), [Linton, Maasoumi and Whang (2005, LMW)](https://ideas.repec.org/a/oup/restud/v72y2005i3p735-765.html), [Linton, Song and Whang (2010, LSW)](https://econpapers.repec.org/article/eeeeconom/v_3a154_3ay_3a2010_3ai_3a2_3ap_3a186-202.htm), [Donald and Hsu (2014, DH)](https://www.tandfonline.com/doi/full/10.1080/07474938.2013.833813). PySDTest also contains stochastic dominance tests by applying the numerical delta method [(Hong and Li (2018, HL))](https://www.sciencedirect.com/science/article/abs/pii/S0304407618300988.html).
+Supported testing procedures include, but are not limited to, tests through the least favorable case approach of [Barrett and Donald (2003, BD)](https://doi.org/10.1111/1468-0262.00390), subsampling approach of [Linton, Maasoumi and Whang (2005, LMW)](https://ideas.repec.org/a/oup/restud/v72y2005i3p735-765.html), contact set approach of [Linton, Song and Whang (2010, LSW)](https://econpapers.repec.org/article/eeeeconom/v_3a154_3ay_3a2010_3ai_3a2_3ap_3a186-202.htm) and sele recentering method of [Donald and Hsu (2014, DH)](https://www.tandfonline.com/doi/full/10.1080/07474938.2013.833813). In addition, the numerical delta method by [(Hong and Li (2018, HL))] can be used to compute the critical value. \pkg{pysdtest} also supports the combination of various resampling methods, test statistics and procedures for approximating the limiting distribution. 
+
+Based on the package, we also introduce the Stata command **pysdtest**.
 
 ## Paper
 
@@ -25,7 +27,6 @@ Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dom
 - Advanced hypotheses testing (Joint hypotheses testing)
 - Plotting (s-th order) CDFs
 - Resampling: bootstrap, subsampling, and paired-bootstrap
-
 
 ## Installation
 
