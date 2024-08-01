@@ -17,7 +17,7 @@
 
 {p 8 17 3}
 {cmd:pysdtest} {varlist}(max=2) [if] [, by(varname) SWitch resampling(string) 
-approach(string) form(string) ngrid(integer 100) s(integer 1) b1(integer 0) b2(integer 0) 
+approach(string) Functional(string) ngrid(integer 100) s(integer 1) b1(integer 0) b2(integer 0) 
 nboot(integer 200) c(real 0.75) a(real 0.1) eta(real 0.000001) epsilon(real 0) alpha(real 0.05)]
 
 {synoptset 20 tabbed}{...}
@@ -33,7 +33,7 @@ nboot(integer 200) c(real 0.75) a(real 0.1) eta(real 0.000001) epsilon(real 0) a
 
 {synopt:{opt approach}}Specify a testing method. If the option is not given, Kolmogorov-Smirnov type test statistic is used as in Barrett and Donald (2003) and Linton et al. (2005). If "contact" is given, the contact set approach by Linton et al. (2010) is performed. If "SR" is given, the selective recentering approach by Donald and Hsu (2016) is performed. If "NDM" is given, the numerical delta method is performed. {p_end}
 
-{synopt:{opt form}}Specify a type of the functional for using the numerical delta method when "NDM" is given for the option approach( ). It must be one of "KS", "L1", and "L2". If the option is not given, "L1" is used as a default option. {p_end}
+{synopt:{opt f:unctional}}Specify a type of the functional for using the numerical delta method when "NDM" is given for the option approach( ). It must be one of "KS", "L1", and "L2". If the option is not given, "L1" is used as a default option. {p_end}
 
 {synopt:{opt ngrid}}Set the number of grid points for calculating test statistics. 100 is set as a default. {p_end}
 
@@ -114,7 +114,7 @@ recentering method of Donald and Hsu (2016). In addition, the numerical delta me
 
 {phang}{cmd:. pysdtest var, by(binary_var) switch}{p_end}
 
-{phang}{cmd:. pysdtest var, by(binary_var) approach("NDM") form("KS") ngrid(100) nboot(500)}{p_end}
+{phang}{cmd:. pysdtest var, by(binary_var) approach("NDM") functional("KS") ngrid(100) nboot(500)}{p_end}
 
 {marker references}{...}
 {title: References}
