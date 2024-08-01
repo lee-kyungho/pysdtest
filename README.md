@@ -32,7 +32,7 @@ in Windows cmd or Mac (or Linux) terminal. For detailed information about instal
 
 ### Stata command
 
-**pysdtest** is the stata command based on the Python package. To use the command, Stata with version higher than 16.0 and installation of the package **PySDTest** are required. The **pysdtest** module (.ado and .sthlp files) can be installed in Stata by the following command:
+We also provide  the stata command **pysdtest** that is based on the Python package. To use the command, Stata with version higher than 16.0 and installation of the package **PySDTest** are required. The **pysdtest** module (.ado and .sthlp files) can be installed in Stata by the following command:
 
 ```{stata}
  net install pysdtest, from("https://raw.githubusercontent.com/lee-kyungho/pysdtest/main/Stata") replace
