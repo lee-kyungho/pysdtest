@@ -44,8 +44,8 @@ in Windows cmd or Mac (or Linux) terminal. For detailed information about instal
 **pysdtest** is the stata command based on the Python package.
 
 
-```python
-pip install PySDTest
+```{stata}
+ net install pysdtest, from("https://raw.githubusercontent.com/lee-kyungho/pysdtest/main/Stata") replace
 ```
 
 
