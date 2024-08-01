@@ -29,6 +29,8 @@ Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dom
 
 ## Installation
 
+### The Python package
+
 **PySDTest** is listed on the Python Package Index (PyPI) which is a repository of software for the Python programming language. If Python is installed on your computer, you can install **PySDTest** by entering:
 
 ```python
@@ -36,6 +38,16 @@ pip install PySDTest
 ```
 
 in Windows cmd or Mac (or Linux) terminal. For detailed information about installing a Python package, see [Python Package User Guide in PyPI](https://packaging.python.org/tutorials/installing-packages/).
+
+### The Stata command
+
+**pysdtest** is the stata command based on the Python package.
+
+
+```python
+pip install PySDTest
+```
+
 
 ## Importation
 
