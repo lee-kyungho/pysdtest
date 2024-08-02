@@ -1,6 +1,6 @@
 # PySDTest
 
-### A Stata/Python Package for Stochastic Dominance Tests
+### A Python/Stata Package for Stochastic Dominance Tests
 
 **PySDTest** is a Python 3 implementation of routines for Stochastic Dominance tests. This package was created by Kyungho Lee in collaboration with Yoon-Jae Whang. 
 
@@ -15,7 +15,9 @@ We also introduce the Stata command **pysdtest** based on the python package for
 
 If you use our package, please cite the paper:
 
+```
 Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2023).
+```
 
 ## Installation
 
