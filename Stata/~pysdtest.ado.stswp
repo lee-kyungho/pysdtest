@@ -18,7 +18,7 @@ program pysdtest, rclass
 		epsilon(real 0) ///
 		alpha(real 0.05)]
     
-    display "Syntax parsed successfully"
+    *display "Syntax parsed successfully"
     	
     marksample touse
 	
@@ -56,6 +56,7 @@ program pysdtest, rclass
 	else {
 	
 	// Extract unique values of the by variable
+	display "Group"
     levelsof `byvar' if `touse', local(levels)
     
     // Ensure there are exactly two levels

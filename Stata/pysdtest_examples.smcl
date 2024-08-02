@@ -3,9 +3,18 @@
       name:  {res}<unnamed>
        {txt}log:  {res}/Users/khlee/Documents/GitHub/pysdtest/Stata/pysdtest_examples.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res} 2 Aug 2024, 17:42:44
+ {txt}opened on:  {res} 2 Aug 2024, 17:47:15
 {txt}
 {com}. 
+. /*
+> 
+> Examples of using pysdtest
+> 
+> Authors: Kyungho Lee and Yoon-Jae Whang
+> Date: Aug 02. 2024.
+> 
+> */
+. 
 . * Simulate the data
 . * Clear the existing dataset
 . clear
@@ -32,7 +41,6 @@ now 100.
 . * Run pysdtest 
 . pysdtest X1 X2
 Running PySDTest
-Syntax parsed successfully
 Sample1: X1
 Sample2: X2
 {res}
@@ -55,15 +63,14 @@ Sample2: X2
 *** Test Result ***
 * Test statistic 	 = 0.2121
 * Significance level 	 =  0.05
-* Critical-value 	 = 1.1314
-* P-value        	 = 0.8600
-* Time elapsed   	 =  0.10 Sec
+* Critical-value 	 = 1.1349
+* P-value        	 = 0.8250
+* Time elapsed   	 =  0.11 Sec
 {txt}
 {com}. 
 . * Run pysdtest with subsampling 
 . pysdtest X1 X2, resampling("subsampling") b1(40) b2(40)
 Running PySDTest
-Syntax parsed successfully
 Sample1: X1
 Sample2: X2
 {res}
@@ -94,7 +101,6 @@ Sample2: X2
 . * Run pysdtest with paired bootstrapping and contact set approach
 . pysdtest X1 X2, resampling("paired_bootstrap") approach("contact") c(0.5)
 Running PySDTest
-Syntax parsed successfully
 Sample1: X1
 Sample2: X2
 {res}
@@ -121,14 +127,14 @@ Sample2: X2
 *** Test Result ***
 * Test statistic 	 = 0.3800
 * Significance level 	 =  0.05
-* Critical-value 	 = 20.3508
-* P-value        	 = 0.8500
+* Critical-value 	 = 16.8062
+* P-value        	 = 0.8150
 * Time elapsed   	 =  0.10 Sec
 {txt}
 {com}. 
-. ******************
-. * Using auto data
-. ******************
+. *************************************
+. * Using auto data with by( ) option *
+. *************************************
 . sysuse auto, clear
 {txt}(1978 automobile data)
 
@@ -143,7 +149,6 @@ Sample2: X2
 . * Run pysdtest with by( ) option
 . pysdtest price, by(foreign_str)
 Running PySDTest
-Syntax parsed successfully
 {res}{txt}`"Domestic"' `"Foreign"'
 Sample1: price of Foreign
 Sample2: price of Domestic
@@ -167,15 +172,14 @@ Sample2: price of Domestic
 *** Test Result ***
 * Test statistic 	 = 0.3025
 * Significance level 	 =  0.05
-* Critical-value 	 = 1.0929
-* P-value        	 = 0.6700
+* Critical-value 	 = 1.0954
+* P-value        	 = 0.6750
 * Time elapsed   	 =  0.04 Sec
 {txt}
 {com}. 
 . * Run pysdtest with by( ) option and switch
 . pysdtest price, by(foreign_str) switch
 Running PySDTest
-Syntax parsed successfully
 {res}{txt}`"Domestic"' `"Foreign"'
 Sample1: price of Domestic
 Sample2: price of Foreign
@@ -199,15 +203,14 @@ Sample2: price of Foreign
 *** Test Result ***
 * Test statistic 	 = 0.8867
 * Significance level 	 =  0.05
-* Critical-value 	 = 1.1280
-* P-value        	 = 0.1350
+* Critical-value 	 = 1.0967
+* P-value        	 = 0.1700
 * Time elapsed   	 =  0.04 Sec
 {txt}
 {com}. 
 . * Run pysdtest with by( ) option, NDM
 . pysdtest price, by(foreign_str) switch approach("NDM") functional("KS") ngrid(200)
 Running PySDTest
-Syntax parsed successfully
 {res}{txt}`"Domestic"' `"Foreign"'
 Sample1: price of Domestic
 Sample2: price of Foreign
@@ -236,8 +239,8 @@ Sample2: price of Foreign
 *** Test Result ***
 * Test statistic 	 = 0.9623
 * Significance level 	 =  0.05
-* Critical-value 	 = 1.0293
-* P-value        	 = 0.0850
+* Critical-value 	 = 1.0489
+* P-value        	 = 0.0700
 * Time elapsed   	 =  0.05 Sec
 {txt}
 {com}. 
@@ -245,7 +248,7 @@ Sample2: price of Foreign
       {txt}name:  {res}<unnamed>
        {txt}log:  {res}/Users/khlee/Documents/GitHub/pysdtest/Stata/pysdtest_examples.smcl
   {txt}log type:  {res}smcl
- {txt}paused on:  {res} 2 Aug 2024, 17:42:45
+ {txt}paused on:  {res} 2 Aug 2024, 17:47:16
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}

@@ -1,3 +1,5 @@
+log using pysdtest_examples.smcl, replace
+
 /*
 
 Examples of using pysdtest
@@ -6,8 +8,6 @@ Authors: Kyungho Lee and Yoon-Jae Whang
 Date: Aug 02. 2024.
 
 */
-
-log using pysdtest_examples.smcl, replace
 
 * Simulate the data
 * Clear the existing dataset
@@ -32,9 +32,9 @@ pysdtest X1 X2, resampling("subsampling") b1(40) b2(40)
 * Run pysdtest with paired bootstrapping and contact set approach
 pysdtest X1 X2, resampling("paired_bootstrap") approach("contact") c(0.5)
 
-******************
-* Using auto data
-******************
+*************************************
+* Using auto data with by( ) option *
+*************************************
 sysuse auto, clear
 
 gen     foreign_str = "Domestic" if foreign == 0

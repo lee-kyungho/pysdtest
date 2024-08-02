@@ -56,6 +56,7 @@ program pysdtest, rclass
 	else {
 	
 	// Extract unique values of the by variable
+	display "Groups:"
     levelsof `byvar' if `touse', local(levels)
     
     // Ensure there are exactly two levels
