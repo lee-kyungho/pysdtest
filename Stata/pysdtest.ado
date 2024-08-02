@@ -18,7 +18,7 @@ program pysdtest, rclass
 		epsilon(real 0) ///
 		alpha(real 0.05)]
     
-    display "Syntax parsed successfully"
+    *display "Syntax parsed successfully"
     	
     marksample touse
 	

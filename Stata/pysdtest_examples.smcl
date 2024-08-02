@@ -1,0 +1,251 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/khlee/Documents/GitHub/pysdtest/Stata/pysdtest_examples.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 2 Aug 2024, 17:42:44
+{txt}
+{com}. 
+. * Simulate the data
+. * Clear the existing dataset
+. clear
+{txt}
+{com}. 
+. * Set the number of observations
+. set obs 100
+{txt}{p}
+Number of observations ({bf:_N}) was 0,
+now 100.
+{p_end}
+
+{com}. 
+. * Set the seed
+. set seed 2024
+{txt}
+{com}. 
+. * Generate a normally distributed variable
+. gen X1 = rnormal(0, 1)
+{txt}
+{com}. gen X2 = rnormal(0, 1)
+{txt}
+{com}. 
+. * Run pysdtest 
+. pysdtest X1 X2
+Running PySDTest
+Syntax parsed successfully
+Sample1: X1
+Sample2: X2
+{res}
+#--- Testing for Stochastic Dominance  -----#
+
+* H0 : sample1 first order SD sample2
+
+#-------------------------------------------#
+
+*** Test Setting ***
+* Resampling method 	 = bootstrap
+* SD order       	 =      1
+* # of (sample1) 	 =    100 
+* # of (sample2)   	 =    100
+* # of bootstrapping 	 =    200
+* # of grid points 	 =    100
+
+#-------------------------------------------#
+
+*** Test Result ***
+* Test statistic 	 = 0.2121
+* Significance level 	 =  0.05
+* Critical-value 	 = 1.1314
+* P-value        	 = 0.8600
+* Time elapsed   	 =  0.10 Sec
+{txt}
+{com}. 
+. * Run pysdtest with subsampling 
+. pysdtest X1 X2, resampling("subsampling") b1(40) b2(40)
+Running PySDTest
+Syntax parsed successfully
+Sample1: X1
+Sample2: X2
+{res}
+#--- Testing for Stochastic Dominance  -----#
+
+* H0 : sample1 first order SD sample2
+
+#-------------------------------------------#
+
+*** Test Setting ***
+* Resampling method 	 = subsampling
+* SD order       	 =      1
+* # of (sample1) 	 =    100 
+* # of (sample2)   	 =    100
+* # of (subsample1) 	 =     40
+* # of (subsample2) 	 =     40
+
+#-------------------------------------------#
+
+*** Test Result ***
+* Test statistic 	 = 0.2121
+* Significance level 	 =  0.05
+* Critical-value 	 = 1.0062
+* P-value        	 = 0.9180
+* Time elapsed   	 =  0.01 Sec
+{txt}
+{com}. 
+. * Run pysdtest with paired bootstrapping and contact set approach
+. pysdtest X1 X2, resampling("paired_bootstrap") approach("contact") c(0.5)
+Running PySDTest
+Syntax parsed successfully
+Sample1: X1
+Sample2: X2
+{res}
+#--- Testing for Stochastic Dominance  -----#
+
+* H0 : sample1 first order SD sample2
+* Contact Set Approach
+
+#-------------------------------------------#
+
+*** Test Setting ***
+* Resampling method 	 = paired_bootstrap
+* SD order       	 =      1
+* # of (sample1) 	 =    100 
+* # of (sample2)   	 =    100
+* # of bootstrapping 	 =    200
+* # of grid points 	 =    100
+
+# Tuning parameter -------
+* c              	 = 0.5000
+
+#-------------------------------------------#
+
+*** Test Result ***
+* Test statistic 	 = 0.3800
+* Significance level 	 =  0.05
+* Critical-value 	 = 20.3508
+* P-value        	 = 0.8500
+* Time elapsed   	 =  0.10 Sec
+{txt}
+{com}. 
+. ******************
+. * Using auto data
+. ******************
+. sysuse auto, clear
+{txt}(1978 automobile data)
+
+{com}. 
+. gen     foreign_str = "Domestic" if foreign == 0
+{txt}(22 missing values generated)
+
+{com}. replace foreign_str = "Foreign"  if foreign == 1
+{txt}(22 real changes made)
+
+{com}. 
+. * Run pysdtest with by( ) option
+. pysdtest price, by(foreign_str)
+Running PySDTest
+Syntax parsed successfully
+{res}{txt}`"Domestic"' `"Foreign"'
+Sample1: price of Foreign
+Sample2: price of Domestic
+{res}
+#--- Testing for Stochastic Dominance  -----#
+
+* H0 : sample1 first order SD sample2
+
+#-------------------------------------------#
+
+*** Test Setting ***
+* Resampling method 	 = bootstrap
+* SD order       	 =      1
+* # of (sample1) 	 =     22 
+* # of (sample2)   	 =     52
+* # of bootstrapping 	 =    200
+* # of grid points 	 =    100
+
+#-------------------------------------------#
+
+*** Test Result ***
+* Test statistic 	 = 0.3025
+* Significance level 	 =  0.05
+* Critical-value 	 = 1.0929
+* P-value        	 = 0.6700
+* Time elapsed   	 =  0.04 Sec
+{txt}
+{com}. 
+. * Run pysdtest with by( ) option and switch
+. pysdtest price, by(foreign_str) switch
+Running PySDTest
+Syntax parsed successfully
+{res}{txt}`"Domestic"' `"Foreign"'
+Sample1: price of Domestic
+Sample2: price of Foreign
+{res}
+#--- Testing for Stochastic Dominance  -----#
+
+* H0 : sample1 first order SD sample2
+
+#-------------------------------------------#
+
+*** Test Setting ***
+* Resampling method 	 = bootstrap
+* SD order       	 =      1
+* # of (sample1) 	 =     52 
+* # of (sample2)   	 =     22
+* # of bootstrapping 	 =    200
+* # of grid points 	 =    100
+
+#-------------------------------------------#
+
+*** Test Result ***
+* Test statistic 	 = 0.8867
+* Significance level 	 =  0.05
+* Critical-value 	 = 1.1280
+* P-value        	 = 0.1350
+* Time elapsed   	 =  0.04 Sec
+{txt}
+{com}. 
+. * Run pysdtest with by( ) option, NDM
+. pysdtest price, by(foreign_str) switch approach("NDM") functional("KS") ngrid(200)
+Running PySDTest
+Syntax parsed successfully
+{res}{txt}`"Domestic"' `"Foreign"'
+Sample1: price of Domestic
+Sample2: price of Foreign
+{res}
+#--- Testing for Stochastic Dominance  -----#
+
+* H0 : sample1 first order SD sample2
+* Numerical Delta Method
+* KS Type Test Statistic 
+
+#-------------------------------------------#
+
+*** Test Setting ***
+* Resampling method 	 = bootstrap
+* SD order       	 =      1
+* # of (sample1) 	 =     52 
+* # of (sample2)   	 =     22
+* # of bootstrapping 	 =    200
+* # of grid points 	 =    200
+
+# Tuning paremeter -------------
+* epsilon        	 = 0.9180
+
+#-------------------------------------------#
+
+*** Test Result ***
+* Test statistic 	 = 0.9623
+* Significance level 	 =  0.05
+* Critical-value 	 = 1.0293
+* P-value        	 = 0.0850
+* Time elapsed   	 =  0.05 Sec
+{txt}
+{com}. 
+. log off
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/khlee/Documents/GitHub/pysdtest/Stata/pysdtest_examples.smcl
+  {txt}log type:  {res}smcl
+ {txt}paused on:  {res} 2 Aug 2024, 17:42:45
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
