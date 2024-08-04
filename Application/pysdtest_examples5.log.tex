@@ -1,0 +1,33 @@
+. 
+. * Run pysdtest with by( ) option and switch
+. pysdtest price, by(foreign_str) switch
+Running PySDTest
+Groups:
+`"Domestic"' `"Foreign"'
+Sample1: price of Domestic
+Sample2: price of Foreign
+{\smallskip}
+\#--- Testing for Stochastic Dominance  -----\#
+{\smallskip}
+* H0 : sample1 first order SD sample2
+{\smallskip}
+\#-------------------------------------------\#
+{\smallskip}
+*** Test Setting ***
+* Resampling method      = bootstrap
+* SD order               =      1
+* \# of (sample1)         =     52 
+* \# of (sample2)         =     22
+* \# of bootstrapping     =    200
+* \# of grid points       =    100
+{\smallskip}
+\#-------------------------------------------\#
+{\smallskip}
+*** Test Result ***
+* Test statistic         = 0.8867
+* Significance level     =  0.05
+* Critical-value         = 0.9912
+* P-value                = 0.1050
+* Time elapsed           =  0.05 Sec
+{\smallskip}
+. 

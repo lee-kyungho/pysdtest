@@ -1,0 +1,44 @@
+. 
+. sysuse auto, clear
+(1978 automobile data)
+{\smallskip}
+. 
+. gen     foreign_str = "Domestic" if foreign == 0
+(22 missing values generated)
+{\smallskip}
+. replace foreign_str = "Foreign"  if foreign == 1
+(22 real changes made)
+{\smallskip}
+. 
+. * Run pysdtest with by( ) option
+. pysdtest price, by(foreign_str)
+Running PySDTest
+Groups:
+`"Domestic"' `"Foreign"'
+Sample1: price of Foreign
+Sample2: price of Domestic
+{\smallskip}
+\#--- Testing for Stochastic Dominance  -----\#
+{\smallskip}
+* H0 : sample1 first order SD sample2
+{\smallskip}
+\#-------------------------------------------\#
+{\smallskip}
+*** Test Setting ***
+* Resampling method      = bootstrap
+* SD order               =      1
+* \# of (sample1)         =     22 
+* \# of (sample2)         =     52
+* \# of bootstrapping     =    200
+* \# of grid points       =    100
+{\smallskip}
+\#-------------------------------------------\#
+{\smallskip}
+*** Test Result ***
+* Test statistic         = 0.3025
+* Significance level     =  0.05
+* Critical-value         = 1.0448
+* P-value                = 0.6350
+* Time elapsed           =  0.05 Sec
+{\smallskip}
+. 
