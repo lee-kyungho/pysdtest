@@ -67,6 +67,7 @@ sjlog close, replace
 sjlog using pysdtest_examples6.smcl, replace
 
 * Run pysdtest with by( ) option, NDM
-pysdtest price, by(foreign_str) switch approach("NDM") functional("KS") ngrid(200)
+pysdtest price, by(foreign_str) switch ///
+approach("NDM") functional("KS") ngrid(200)
 
 sjlog close, replace
