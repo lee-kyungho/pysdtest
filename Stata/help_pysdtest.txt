@@ -151,5 +151,3 @@ Examples
 
     Linton, Oliver, Kyungchul Song, and Yoon-Jae Whang. "An improved bootstrap test of stochastic
     dominance." Journal of Econometrics 154, no. 2 (2010): 186-202.
-
-}
