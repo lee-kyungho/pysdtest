@@ -16,7 +16,7 @@ We also introduce the Stata command **pysdtest** based on the python package for
 If you use our package, please cite the paper:
 
 ```
-Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2023).
+Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python/Stata Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2024).
 ```
 
 ## Installation
