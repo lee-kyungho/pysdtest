@@ -129,7 +129,7 @@ recentering method of Donald and Hsu (2016). In addition, the numerical delta me
 
 {pstd} Hong, Han, and Jessie Li. "The numerical delta method." Journal of Econometrics 206, no. 2 (2018): 379-394.
 
-{pstd} Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2024).
+{pstd} Lee, Kyungho, and Yoon-Jae Whang. "PySDTest: a Python/Stata Package for Stochastic Dominance Tests." arXiv preprint arXiv:2307.10694 (2024).
 
 {pstd}
 Linton, Oliver, Esfandiar Maasoumi, and Yoon-Jae Whang. "Consistent testing for stochastic dominance under general sampling schemes." The Review of Economic Studies 72, no. 3 (2005): 735-765.
