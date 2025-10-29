@@ -1,3 +1,7 @@
+*! version 1.0.0 22oct2025
+*! author: Kyungho Lee and Yoon-Jae Whang
+*! email: kyungho.lee@yale.edu, whang@snu.ac.kr
+*! Testing for Stochastic Dominance in Stata through pysdtest
 program pysdtest, rclass
     version 16.0
     display "Running PySDTest"
@@ -19,23 +23,30 @@ program pysdtest, rclass
 		alpha(real 0.05)]
     
     *display "Syntax parsed successfully"
-    	
-    marksample touse
 	
-    // Validate resampling method
-    if !inlist("`resampling'",  "", "bootstrap", "subsampling", "paired_bootstrap") {
-        display as error "resampling must be one of: bootstrap, subsampling, or paired bootstrap"
-         exit 198
-     }
+	preserve 
+	
+		if "`if'" != "" {
+			quietly keep `if' 
+			}
+			
+	marksample touse
 
-    // Validate subsampling sizes if method is subsampling
-    if "`resampling'" == "subsampling" & (`b1' == 0 | `b2' == 0) {
-        display as error "b1 and b2 must be specified for subsampling method"
-        exit 198
-    }
+	
+	// Validate resampling method
+	if !inlist("`resampling'",  "", "bootstrap", "subsampling", "paired_bootstrap") {
+		display as error "resampling must be one of: bootstrap, subsampling, or paired bootstrap"
+		 exit 198
+	 }
+
+	// Validate subsampling sizes if method is subsampling
+	if "`resampling'" == "subsampling" & (`b1' == 0 | `b2' == 0) {
+		display as error "b1 and b2 must be specified for subsampling method"
+		exit 198
+	}
 
 	local byvar `by'
-    if "`byvar'" == "" {
+	if "`byvar'" == "" {
 		local var1: word 1 of `varlist'
 		local var2: word 2 of `varlist'
 		
@@ -50,17 +61,17 @@ program pysdtest, rclass
 			display as error "Specify a correct approach. It needs to be one of empty string '', 'contact', 'SR', or 'NDM'"
 		}
 		
-    }
+	}
 
 	* if by( ) is specified
 	else {
 	
 	// Extract unique values of the by variable
 	display "Groups:"
-    levelsof `byvar' if `touse', local(levels)
-    
-    // Ensure there are exactly two levels
-    local nlevels : word count `levels'
+	levelsof `byvar' if `touse', local(levels)
+	
+	// Ensure there are exactly two levels
+	local nlevels : word count `levels'
 		if `nlevels' != 2 {
 			display as error "by() variable must have exactly two levels"
 			exit 198
@@ -89,18 +100,18 @@ program pysdtest, rclass
 		}	
 	}
 	
-    // Return results
+	// Return results
 	// scalar
-    return scalar N1  	       = r(N1)
-    return scalar N2           = r(N2)
-    return scalar b1  	       = r(b1)
-    return scalar b2           = r(b2)
-    return scalar s            = r(s)
-    return scalar alpha        = r(alpha)
-    return scalar ngrid        = r(ngrid)
-    return scalar test_stat    = r(test_stat)
-    return scalar p_val        = r(p_val)
-    return scalar critic_val   = r(critic_val)
+	return scalar N1  	       = r(N1)
+	return scalar N2           = r(N2)
+	return scalar b1  	       = r(b1)
+	return scalar b2           = r(b2)
+	return scalar s            = r(s)
+	return scalar alpha        = r(alpha)
+	return scalar ngrid        = r(ngrid)
+	return scalar test_stat    = r(test_stat)
+	return scalar p_val        = r(p_val)
+	return scalar critic_val   = r(critic_val)
 
 	// matrix
 	return matrix grid = grid
@@ -111,6 +122,7 @@ program pysdtest, rclass
 	global approach          "`approach'"
 	global functional        "`functional'"
 
+	restore
 end
 
 python:
