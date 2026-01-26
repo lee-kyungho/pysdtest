@@ -2,7 +2,6 @@ v 3
 d pysdtest: testing for stochastic dominance in Stata
 f pysdtest.ado
 f pysdtest.sthlp
-f pysdtest/__init__.py
 f pysdtest/pysdtest.py
 f pysdtest/Resampling_Functions.py
 f pysdtest/Test_Stat_Functions.py
