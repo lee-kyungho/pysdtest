@@ -1,4 +1,4 @@
-*! version 2.0 26Jan2026
+*! version 2.0.0 26Jan2025
 *! author: Kyungho Lee and Yoon-Jae Whang
 *! email: kyungho.lee@yale.edu, whang@snu.ac.kr
 *! Testing for Stochastic Dominance in Stata through pysdtest
@@ -23,14 +23,6 @@ program pysdtest, rclass
 		alpha(real 0.05)]
     
     *display "Syntax parsed successfully"
-	
-	preserve 
-	
-		if "`if'" != "" {
-			quietly keep `if' 
-			}
-			
-	marksample touse
 
 	// Paths for Python fallback imports
 	quietly which pysdtest
@@ -40,6 +32,15 @@ program pysdtest, rclass
 	global PYSDTEST_ADODIR "`ado_dir'"
 	global PYSDTEST_PYDIR  "`c(sysdir_plus)'py"
 
+	preserve 
+	
+		if "`if'" != "" {
+			quietly keep `if' 
+			}
+			
+	marksample touse
+
+	
 	// Validate resampling method
 	if !inlist("`resampling'",  "", "bootstrap", "subsampling", "paired_bootstrap") {
 		display as error "resampling must be one of: bootstrap, subsampling, or paired bootstrap"
@@ -133,8 +134,7 @@ program pysdtest, rclass
 end
 
 python:
-import sys, os
-from sfi import Data, Scalar, Matrix, Macro, SFIToolkit
+import sys
 from sfi import Data, Scalar, Matrix, Macro, SFIToolkit
 
 def _add_path(p):
