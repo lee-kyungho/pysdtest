@@ -1,4 +1,4 @@
-v 2
+v 3
 d pysdtest: testing for stochastic dominance in Stata
 f pysdtest.ado
 f pysdtest.sthlp
