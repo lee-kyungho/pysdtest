@@ -32,7 +32,14 @@ program pysdtest, rclass
 			
 	marksample touse
 
+	// Paths for Python fallback imports
+	quietly which pysdtest
+	local ado_file = r(fn)
+	local ado_dir : dir "`ado_file'" dirname
 	
+	global PYSDTEST_ADODIR "`ado_dir'"
+	global PYSDTEST_PYDIR  "`c(sysdir_plus)'py"
+
 	// Validate resampling method
 	if !inlist("`resampling'",  "", "bootstrap", "subsampling", "paired_bootstrap") {
 		display as error "resampling must be one of: bootstrap, subsampling, or paired bootstrap"
@@ -126,9 +133,51 @@ program pysdtest, rclass
 end
 
 python:
-import numpy as np
-import pysdtest
+import sys, os
 from sfi import Data, Scalar, Matrix, Macro, SFIToolkit
+from sfi import Data, Scalar, Matrix, Macro, SFIToolkit
+
+def _add_path(p):
+    if p and p not in sys.path:
+        sys.path.insert(0, p)
+
+def _import_pysdtest():
+    # 1) First try normal import (pip-installed)
+    try:
+        import pysdtest
+        return pysdtest
+    except Exception as e1:
+        # 2) Try the ado directory
+        _add_path(Macro.getGlobal("PYSDTEST_ADODIR"))
+        try:
+            import pysdtest
+            return pysdtest
+        except Exception as e2:
+            # 3) Try Stata PLUS/py directory
+            _add_path(Macro.getGlobal("PYSDTEST_PYDIR"))
+            try:
+                import pysdtest
+                return pysdtest
+            except Exception as e3:
+                raise RuntimeError(
+                    "Could not import Python module 'pysdtest'. Tried:\n"
+                    "  (1) default sys.path (pip install)\n"
+                    "  (2) directory containing pysdtest.ado\n"
+                    "  (3) Stata PLUS/py directory\n\n"
+                    f"Python: {sys.executable}\n"
+                    f"PYSDTEST_ADODIR: {Macro.getGlobal('PYSDTEST_ADODIR')}\n"
+                    f"PYSDTEST_PYDIR:  {Macro.getGlobal('PYSDTEST_PYDIR')}\n"
+                    f"sys.path[0:6]: {sys.path[0:6]}\n\n"
+                    f"Errors:\n"
+                    f"  default import: {repr(e1)}\n"
+                    f"  after ADODIR:   {repr(e2)}\n"
+                    f"  after PYDIR:    {repr(e3)}\n"
+                )
+
+# Make module available to the rest of this file
+pysdtest = _import_pysdtest()
+
+import numpy as np
 
 def arrange_sample(var1, var2, touse):
 
