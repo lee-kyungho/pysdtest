@@ -1,4 +1,4 @@
-*! version 1.1 26Jan2026
+*! version 2.0 26Jan2026
 *! author: Kyungho Lee and Yoon-Jae Whang
 *! email: kyungho.lee@yale.edu, whang@snu.ac.kr
 *! Testing for Stochastic Dominance in Stata through pysdtest
