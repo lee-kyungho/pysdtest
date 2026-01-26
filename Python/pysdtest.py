@@ -3,13 +3,13 @@
 @author: Kyungho Lee
 Latest Update at Jan 26, 2026
 
-Python Package for Stochastic Dominance Tests (Accompanying Stata)
+Python Package for Stochastic Dominance Tests
 
 """
 
 # Import modules
-from Resampling_Functions import bootstrap, subsampling, paired_bootstrap
-from Test_Stat_Functions import CDF, set_grid
+from pysdtest.Resampling_Functions import bootstrap, subsampling, paired_bootstrap
+from pysdtest.Test_Stat_Functions import CDF, set_grid
 import numpy as np
 import matplotlib.pyplot as plt
 import time
