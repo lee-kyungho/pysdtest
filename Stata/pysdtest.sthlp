@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0  31 Jul 2024}{...}
+{* *! version 1.1  26 Jan 2026}{...}
 {viewerjumpto "Syntax" "pysdtest##syntax"}{...}
 {viewerjumpto "Description" "pysdtest##description"}{...}
 {viewerjumpto "Options" "pysdtest##options"}{...}
