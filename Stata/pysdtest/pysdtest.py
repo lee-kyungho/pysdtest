@@ -8,8 +8,8 @@ Python Package for Stochastic Dominance Tests (Accompanying Stata)
 """
 
 # Import modules
-from Resampling_Functions import bootstrap, subsampling, paired_bootstrap
-from Test_Stat_Functions import CDF, set_grid
+from resampling_functions import bootstrap, subsampling, paired_bootstrap
+from test_stat_functions import CDF, set_grid
 import numpy as np
 import matplotlib.pyplot as plt
 import time
